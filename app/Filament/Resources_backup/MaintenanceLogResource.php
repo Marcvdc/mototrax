@@ -1,0 +1,116 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use App\Filament\Resources\MaintenanceLogResource\Pages;
+use App\Models\MaintenanceLog;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+
+class MaintenanceLogResource extends Resource
+{
+    protected static ?string $model = MaintenanceLog::class;
+
+    protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
+
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\Select::make('user_id')
+                    ->relationship('user', 'name')
+                    ->required()
+                    ->searchable()
+                    ->preload(),
+                Forms\Components\Select::make('bike_id')
+                    ->relationship('bike', 'brand')
+                    ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->brand} {$record->model}")
+                    ->required()
+                    ->searchable()
+                    ->preload(),
+                Forms\Components\TextInput::make('title')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\Select::make('type')
+                    ->options(MaintenanceLog::getMaintenanceTypes())
+                    ->required(),
+                Forms\Components\Textarea::make('description')
+                    ->columnSpanFull(),
+                Forms\Components\TextInput::make('km_at_maintenance')
+                    ->label('KM at Maintenance')
+                    ->required()
+                    ->numeric(),
+                Forms\Components\TextInput::make('cost')
+                    ->numeric()
+                    ->prefix('€')
+                    ->step(0.01),
+                Forms\Components\DatePicker::make('date')
+                    ->required()
+                    ->default(now()),
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('user.name')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('bike.brand')
+                    ->label('Bike')
+                    ->formatStateUsing(fn ($record) => "{$record->bike->brand} {$record->bike->model}")
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('title')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('type')
+                    ->formatStateUsing(fn ($state) => MaintenanceLog::getMaintenanceTypes()[$state] ?? $state),
+                Tables\Columns\TextColumn::make('km_at_maintenance')
+                    ->numeric()
+                    ->sortable()
+                    ->formatStateUsing(fn ($state) => number_format($state) . ' km'),
+                Tables\Columns\TextColumn::make('cost')
+                    ->money('EUR')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('date')
+                    ->date()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('type')
+                    ->options(MaintenanceLog::getMaintenanceTypes()),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListMaintenanceLogs::route('/'),
+            'create' => Pages\CreateMaintenanceLog::route('/create'),
+            'edit' => Pages\EditMaintenanceLog::route('/{record}/edit'),
+        ];
+    }
+}

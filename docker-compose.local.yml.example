@@ -1,0 +1,16 @@
+# Example local configuration - copy to docker-compose.local.yml and customize
+version: '3.8'
+
+services:
+  nginx:
+    ports:
+      - "8080:80"  # Change to your preferred port: "9000:80", "8081:80", etc.
+  
+  db:
+    ports:
+      - "5433:5432"  # Change to your preferred port: "5434:5432", "5435:5432", etc.
+
+# Usage:
+# 1. Copy this file: cp docker-compose.local.yml.example docker-compose.local.yml
+# 2. Edit the ports in docker-compose.local.yml to avoid conflicts
+# 3. Run: docker-compose -f docker-compose.yml -f docker-compose.local.yml up -d

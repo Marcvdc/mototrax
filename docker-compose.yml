@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mototrax_app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+      - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - mototrax_network
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    container_name: mototrax_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mototrax
+      POSTGRES_USER: mototrax_user
+      POSTGRES_PASSWORD: mototrax_password
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    # Remove external port mapping to avoid conflicts
+    # Internal port 5432 is still accessible within the Docker network
+    networks:
+      - mototrax_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: mototrax_nginx
+    restart: unless-stopped
+    # Port mapping handled in override files to avoid conflicts
+    # Use docker-compose.local.yml for custom port configuration
+    volumes:
+      - ./:/var/www/html
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - mototrax_network
+    depends_on:
+      - app
+
+networks:
+  mototrax_network:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local

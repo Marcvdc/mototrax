@@ -1,0 +1,77 @@
+*.log
+.DS_Store
+.env
+.env.backup
+.env.production
+.env.local
+.env.php
+.env.*.local
+.phpactor.json
+.phpunit.result.cache
+.phpunit.cache
+/.fleet
+/.idea
+/.nova
+/.vscode
+/.zed
+/auth.json
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+/vendor
+Homestead.json
+Homestead.yaml
+Thumbs.db
+
+# Laravel framework files
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+/storage/logs/*
+/storage/app/laravel.log
+
+# Static assets and compiled files
+/public/css/*.css
+/public/js/*.js
+/public/mix-manifest.json
+/public/assets
+/public/dist
+/public/build
+
+# Bootstrap cache
+/bootstrap/cache/config.php
+/bootstrap/cache/packages.php
+/bootstrap/cache/services.php
+/bootstrap/cache/*.php
+
+# Node.js
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Composer
+composer.phar
+
+# IDE and editor files
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Testing
+/tests/coverage/
+
+# Deployment
+.deploy
+.gitdeploy
+.git-deploy

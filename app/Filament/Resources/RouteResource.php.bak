@@ -1,0 +1,123 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use App\Filament\Resources\RouteResource\Pages;
+use App\Models\Route;
+use BackedEnum;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables;
+use Filament\Tables\Table;
+
+class RouteResource extends Resource
+{
+    protected static ?string $model = Route::class;
+
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedMapPin;
+
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\Select::make('user_id')
+                    ->relationship('user', 'name')
+                    ->required()
+                    ->searchable()
+                    ->preload(),
+                Forms\Components\TextInput::make('name')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\Textarea::make('description')
+                    ->columnSpanFull(),
+                Forms\Components\FileUpload::make('gpx_file')
+                    ->label('GPX File')
+                    ->acceptedFileTypes(['application/gpx+xml', '.gpx'])
+                    ->directory('gpx')
+                    ->maxSize(10240) // 10MB
+                    ->required(),
+                Forms\Components\CheckboxList::make('tags')
+                    ->options(Route::getCommonTags())
+                    ->columns(3),
+                Forms\Components\TextInput::make('distance')
+                    ->numeric()
+                    ->step(0.1)
+                    ->suffix('km'),
+                Forms\Components\TextInput::make('estimated_time')
+                    ->label('Estimated Time (minutes)')
+                    ->numeric(),
+                Forms\Components\Select::make('difficulty')
+                    ->options(Route::getDifficultyLevels()),
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('user.name')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('distance')
+                    ->numeric()
+                    ->sortable()
+                    ->formatStateUsing(fn ($state) => $state ? number_format($state, 1) . ' km' : 'N/A'),
+                Tables\Columns\TextColumn::make('estimated_time')
+                    ->label('Time')
+                    ->formatStateUsing(fn ($record) => $record->formatted_time),
+                Tables\Columns\TextColumn::make('difficulty')
+                    ->formatStateUsing(fn ($state) => Route::getDifficultyLevels()[$state] ?? $state),
+                Tables\Columns\TextColumn::make('tags')
+                    ->formatStateUsing(function ($state) {
+                        if (!$state) return 'None';
+                        $tags = array_map(fn ($tag) => Route::getCommonTags()[$tag] ?? $tag, $state);
+                        return implode(', ', array_slice($tags, 0, 3)) . (count($tags) > 3 ? '...' : '');
+                    }),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('difficulty')
+                    ->options(Route::getDifficultyLevels()),
+                Tables\Filters\SelectFilter::make('tags')
+                    ->options(Route::getCommonTags())
+                    ->multiple(),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\Action::make('download_gpx')
+                    ->label('Download GPX')
+                    ->icon('heroicon-o-arrow-down')
+                    ->url(fn (Route $record): string => $record->gpx_url)
+                    ->openUrlInNewTab(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListRoutes::route('/'),
+            'create' => Pages\CreateRoute::route('/create'),
+            'edit' => Pages\EditRoute::route('/{record}/edit'),
+        ];
+    }
+}

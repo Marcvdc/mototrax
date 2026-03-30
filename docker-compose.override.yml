@@ -1,0 +1,12 @@
+# Override file for local development with custom ports
+# Copy this file to docker-compose.local.yml and modify as needed
+version: '3.8'
+
+services:
+  nginx:
+    ports:
+      - "8080:80"  # Change this to avoid conflicts
+  
+  db:
+    ports:
+      - "5433:5432"  # Change this to avoid conflicts
