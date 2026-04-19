@@ -30,9 +30,9 @@ Route::get('/routes', [RouteController::class, 'index']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/bikes', [BikeController::class, 'store']);
     Route::put('/bikes/{bike}', [BikeController::class, 'update']);
-    Route::delete('/bikes/{bike}', [BikeController::class, 'delete']);
-    
+    Route::delete('/bikes/{bike}', [BikeController::class, 'destroy']);
+
     Route::post('/routes', [RouteController::class, 'store']);
     Route::put('/routes/{route}', [RouteController::class, 'update']);
-    Route::delete('/routes/{route}', [RouteController::class, 'delete']);
+    Route::delete('/routes/{route}', [RouteController::class, 'destroy']);
 });
