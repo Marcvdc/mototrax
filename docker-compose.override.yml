@@ -5,8 +5,8 @@ version: '3.8'
 services:
   nginx:
     ports:
-      - "8080:80"  # Change this to avoid conflicts
-  
+      - "18081:80"
+
   db:
     ports:
-      - "5433:5432"  # Change this to avoid conflicts
+      - "5433:5432"

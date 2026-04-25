@@ -30,17 +30,16 @@ COPY . /var/www/html
 # Install composer dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Set proper permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache \
+# Set permissions
+RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod 1777 /tmp
+
+# Copy php-fpm pool override (run workers as host user uid/gid 1000)
+COPY php/zz-www-override.conf /usr/local/etc/php-fpm.d/zz-www-override.conf
 
 # Copy and set up entrypoint
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-
-# Change current user to www
-USER www-data
 
 # Expose port 9000 and start php-fpm server
 EXPOSE 9000
