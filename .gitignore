@@ -25,6 +25,7 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+docker-compose.local.yml
 
 # Laravel framework files
 /storage/framework/cache/data/*
