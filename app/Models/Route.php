@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Database\Factories\RouteFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Route extends Model
 {
-    /** @use HasFactory<\Database\Factories\RouteFactory> */
+    /** @use HasFactory<RouteFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -21,13 +23,35 @@ class Route extends Model
         'distance',
         'estimated_time',
         'difficulty',
+        'is_public',
+        'bbox',
+        'start_lat',
+        'start_lng',
+        'end_lat',
+        'end_lng',
+        'waypoint_count',
     ];
 
-    protected $casts = [
-        'tags' => 'array',
-        'distance' => 'decimal:2',
-        'estimated_time' => 'integer',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'tags' => 'array',
+            'bbox' => 'array',
+            'distance' => 'decimal:3',
+            'estimated_time' => 'integer',
+            'is_public' => 'boolean',
+            'start_lat' => 'decimal:7',
+            'start_lng' => 'decimal:7',
+            'end_lat' => 'decimal:7',
+            'end_lng' => 'decimal:7',
+            'waypoint_count' => 'integer',
+        ];
+    }
+
+    public function scopePublic(Builder $query): Builder
+    {
+        return $query->where('is_public', true);
+    }
 
     public function user(): BelongsTo
     {
@@ -41,24 +65,24 @@ class Route extends Model
 
     public function getGpxUrlAttribute(): string
     {
-        return asset('storage/' . $this->gpx_file);
+        return route('api.routes.gpx', ['route' => $this->id]);
     }
 
     public function getFormattedDistanceAttribute(): string
     {
-        return number_format($this->distance, 1) . ' km';
+        return number_format($this->distance, 1).' km';
     }
 
     public function getFormattedTimeAttribute(): string
     {
         $hours = floor($this->estimated_time / 60);
         $minutes = $this->estimated_time % 60;
-        
+
         if ($hours > 0) {
-            return $hours . 'h ' . $minutes . 'min';
+            return $hours.'h '.$minutes.'min';
         }
-        
-        return $minutes . ' min';
+
+        return $minutes.' min';
     }
 
     public static function getDifficultyLevels(): array

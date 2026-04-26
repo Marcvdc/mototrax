@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Route;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,13 +19,21 @@ class RouteFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => \App\Models\User::factory(),
+            'user_id' => User::factory(),
             'name' => fake()->sentence(2),
             'description' => fake()->paragraph(),
-            'distance' => fake()->randomFloat(1, 10, 200),
+            'gpx_file' => 'gpx/'.fake()->uuid().'.gpx',
+            'distance' => fake()->randomFloat(3, 10, 200),
             'estimated_time' => fake()->numberBetween(30, 240),
-            'difficulty' => fake()->randomElement(['easy', 'moderate', 'hard', 'expert']),
-            'tags' => fake()->randomElements(['scenic', 'curvy', 'mountain', 'coastal', 'urban', 'rural', 'touring'], rand(1, 3)),
+            'difficulty' => fake()->randomElement(array_keys(Route::getDifficultyLevels())),
+            'tags' => fake()->randomElements(array_keys(Route::getCommonTags()), rand(1, 3)),
+            'is_public' => false,
+            'waypoint_count' => fake()->numberBetween(50, 5000),
         ];
+    }
+
+    public function public(): self
+    {
+        return $this->state(fn (): array => ['is_public' => true]);
     }
 }
