@@ -9,10 +9,13 @@ class AdminUserSeeder extends Seeder
 {
     public function run(): void
     {
-        User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@mototrax.dev',
-            'password' => 'password', // Laravel will automatically hash this due to the 'hashed' cast
-        ]);
+        User::updateOrCreate(
+            ['email' => 'admin@mototrax.dev'],
+            [
+                'name' => 'Admin User',
+                'password' => 'password',
+                'is_admin' => true,
+            ],
+        );
     }
 }
