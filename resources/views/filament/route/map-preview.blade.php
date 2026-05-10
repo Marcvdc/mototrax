@@ -4,5 +4,7 @@
 
 <div class="fi-route-map-wrapper">
     <x-route-map :route="$record" />
-    @vite(['resources/css/app.css', 'resources/js/route-map.js'])
+    @once('route-map-assets')
+        @vite(['resources/js/route-map.js'])
+    @endonce
 </div>
