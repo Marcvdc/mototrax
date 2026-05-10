@@ -11,6 +11,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -18,6 +19,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\View as ViewComponent;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
@@ -77,6 +79,9 @@ class RouteResource extends Resource
                     ->numeric()
                     ->disabled()
                     ->dehydrated(),
+                ViewComponent::make('filament.route.map-preview')
+                    ->visible(fn (?string $operation): bool => $operation !== 'create')
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -116,6 +121,7 @@ class RouteResource extends Resource
                     ->label('Publiek'),
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
                 Action::make('download_gpx')
@@ -141,6 +147,7 @@ class RouteResource extends Resource
         return [
             'index' => Pages\ListRoutes::route('/'),
             'create' => Pages\CreateRoute::route('/create'),
+            'view' => Pages\ViewRoute::route('/{record}'),
             'edit' => Pages\EditRoute::route('/{record}/edit'),
         ];
     }
