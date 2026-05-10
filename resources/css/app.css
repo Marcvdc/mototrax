@@ -1,3 +1,45 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.route-map-container {
+    height: 420px;
+    width: 100%;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: #f3f4f6;
+}
+
+.route-map-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 240px;
+    border: 1px dashed #d1d5db;
+    border-radius: 0.5rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+    background: #f9fafb;
+}
+
+.route-map-marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 9999px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.75rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    border: 2px solid #fff;
+}
+
+.route-map-marker--start {
+    background: #16a34a;
+}
+
+.route-map-marker--end {
+    background: #dc2626;
+}
