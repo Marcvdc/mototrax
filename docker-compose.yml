@@ -12,6 +12,7 @@ services:
     volumes:
       - ./:/var/www/html
       - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+      - storagedata:/var/www/html/storage/app/private
     env_file:
       - .env
     networks:
@@ -58,4 +59,6 @@ networks:
 
 volumes:
   dbdata:
+    driver: local
+  storagedata:
     driver: local
