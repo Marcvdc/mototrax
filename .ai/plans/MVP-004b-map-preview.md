@@ -109,15 +109,15 @@ MAP_TILE_MAX_ZOOM=19
 - **JS smoke:** handmatige verificatie in browser bij PR-review (geen Vitest setup nu).
 
 ## 7. Definition of Done
-- [ ] AC-1 t/m AC-8 groen
-- [ ] PHPUnit groen (`php artisan test --compact --filter="RouteMapPreview|RouteShow"`)
-- [ ] `pint` schoon, `php -l` schoon
-- [ ] `npm run build` succesvol; bundle-size diff < 100 KB gzipped
-- [ ] Geen browser-console errors op Edit/View/publieke pagina (manueel)
-- [ ] CSP-headers geverifieerd (geen tile-fouten in console)
-- [ ] ADR `docs/MotoTrax/adr/0002-map-library-leaflet.md` met motivatie Leaflet + OSM + env-fallback
-- [ ] `docs/MotoTrax/architecture.md` aangevuld met Map Preview sectie (Filament + publieke web view)
-- [ ] Issue #1 — sub-bullet onder MVP-004 voor map-preview afgevinkt
+- [x] AC-1 t/m AC-8 geïmplementeerd (zie tests RouteMapPreviewTest + RouteShowTest)
+- [x] PHPUnit groen (`php artisan test --compact --filter="RouteMapPreview|RouteShow"`) — 9/9
+- [x] `pint` schoon (9 gewijzigde bestanden), `php -l` schoon
+- [x] `npm run build` succesvol; route-map bundle 44 KB gzipped (< 100 KB DoD)
+- [ ] Geen browser-console errors op Edit/View/publieke pagina (manueel — na PR merge)
+- [ ] CSP-headers geverifieerd (geen tile-fouten in console — na PR merge)
+- [x] ADR `docs/MotoTrax/adr/0002-map-library-leaflet.md` aangemaakt
+- [x] `docs/MotoTrax/architecture.md` aangevuld met Map Preview sectie
+- [ ] Issue #1 — sub-bullet onder MVP-004 voor map-preview afgevinkt (na merge)
 
 ## 8. Build-volgorde (BUILD MODE)
 1. **Pre-werk (op `master` worktree):** wacht tot `mvp-004-gpx` gemerged is. Daarna `./scripts/worktree-setup.sh mvp-004b-map-preview <offset>` op host.
