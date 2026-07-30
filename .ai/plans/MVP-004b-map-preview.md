@@ -138,3 +138,26 @@ MAP_TILE_MAX_ZOOM=19
 1. **APPROVED?** Bevestig dat dit PLAN goed is — dan zet ik status op APPROVED en wacht op merge `mvp-004-gpx` voor BUILD MODE.
 2. **Volgorde:** ben je akkoord dat we eerst `mvp-004-gpx` afronden+mergen (tests/lint/PR) vóór we MVP-004b worktree aanmaken? (alternatief: PLAN goedgekeurd parkeren tot mvp-004-gpx merged is — wat ik aanbeveel)
 3. **Worktree-offset:** welk getal? (huidige `mvp-004-gpx` gebruikt waarschijnlijk offset 1 → poort 18082/5434; voor mvp-004b voorstel offset 2 → 18083/5435).
+
+## 10. Scope-uitbreiding — admin-autorisatielaag (goedgekeurd 2026-07-20)
+
+Tijdens de BUILD is aan deze PR een admin-autorisatielaag toegevoegd die oorspronkelijk
+buiten het plan viel. Bij review is deze uitbreiding **expliciet goedgekeurd door Marcvdc
+(2026-07-20)** om in PR #4 te blijven i.p.v. afgesplitst te worden.
+
+### Onderdelen
+- `is_admin` boolean-kolom op `users` (default `false`) — migratie `2026_05_10_053103_add_is_admin_to_users_table`.
+- `User::isAdmin(): bool` + cast `is_admin => boolean`.
+- `Gate::before` in `AppServiceProvider` — een admin passeert elke policy/gate (super-admin bypass).
+- `AdminUserSeeder` zet de standaard-admin op `is_admin = true`.
+
+### Security-hardening (verplicht bij deze uitbreiding)
+- `is_admin` staat **NIET** in `#[Fillable]` — enkel expliciet te zetten via seeder/command,
+  zodat de `Gate::before`-bypass geen mass-assignment-escalatievector wordt.
+- De `Gate::before`-closure is getypeerd (`?User $user`) en null-safe (gasten → geen bypass).
+
+### Bekende, bewust geaccepteerde restpunten (opvolg buiten deze PR)
+- Het Filament-panel is nog niet op `isAdmin()` gerestricteerd (`canAccessPanel`), en
+  `RoutePolicy::viewAny()` + de ongescopede `ListRoutes`-query laten ingelogde niet-admins
+  andermans routes in `/admin/routes` zien. Dit is **pre-existing** (niet door deze PR
+  geïntroduceerd) en hoort in een eigen ticket samen met panel-toegang op basis van `is_admin`.

@@ -9,13 +9,10 @@ class AdminUserSeeder extends Seeder
 {
     public function run(): void
     {
-        User::updateOrCreate(
-            ['email' => 'admin@mototrax.dev'],
-            [
-                'name' => 'Admin User',
-                'password' => 'password',
-                'is_admin' => true,
-            ],
-        );
+        $admin = User::firstOrNew(['email' => 'admin@mototrax.dev']);
+        $admin->name = 'Admin User';
+        $admin->password = 'password';
+        $admin->is_admin = true;
+        $admin->save();
     }
 }

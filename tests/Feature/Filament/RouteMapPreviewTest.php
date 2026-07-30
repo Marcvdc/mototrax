@@ -57,6 +57,21 @@ class RouteMapPreviewTest extends TestCase
         $response->assertDontSee('data-route-map', escape: false);
     }
 
+    public function test_filament_view_page_shows_placeholder_when_track_unavailable(): void
+    {
+        $admin = User::factory()->create();
+        // gpx_file verwijst naar een bestand dat niet in de (fake) storage staat,
+        // dus RouteService::toGeoJson() gooit InvalidGpxException → placeholder.
+        $route = Route::factory()->create(['user_id' => $admin->id, 'is_public' => false]);
+
+        $response = $this->actingAs($admin)
+            ->get("/admin/routes/{$route->id}")
+            ->assertOk();
+
+        $response->assertSee('Geen track beschikbaar.');
+        $response->assertDontSee('data-route-map', escape: false);
+    }
+
     /**
      * @param  array<string, mixed>  $attributes
      */

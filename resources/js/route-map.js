@@ -14,16 +14,25 @@ L.Icon.Default.mergeOptions({
     shadowUrl: markerShadow,
 });
 
+// Marker-styling wordt inline meegegeven zodat de divIcons ook renderen op
+// pagina's die resources/css/app.css niet laden (Filament-panels gebruiken hun
+// eigen theme-CSS). De .route-map-marker--* classes blijven staan als hook voor
+// overrides op de publieke web-pagina.
+const MARKER_BASE_STYLE =
+    'display:flex;align-items:center;justify-content:center;width:24px;height:24px;' +
+    'border-radius:9999px;color:#fff;font-weight:700;font-size:0.75rem;' +
+    'box-shadow:0 1px 2px rgba(0,0,0,0.4);border:2px solid #fff;';
+
 const startIcon = L.divIcon({
     className: 'route-map-marker route-map-marker--start',
-    html: '<span aria-hidden="true">S</span>',
+    html: `<span aria-hidden="true" style="${MARKER_BASE_STYLE}background:#16a34a;">S</span>`,
     iconSize: [24, 24],
     iconAnchor: [12, 12],
 });
 
 const endIcon = L.divIcon({
     className: 'route-map-marker route-map-marker--end',
-    html: '<span aria-hidden="true">F</span>',
+    html: `<span aria-hidden="true" style="${MARKER_BASE_STYLE}background:#dc2626;">F</span>`,
     iconSize: [24, 24],
     iconAnchor: [12, 12],
 });
