@@ -2,7 +2,10 @@
 
 namespace Database\Factories;
 
+use App\Models\MaintenanceLog;
 use App\Models\Post;
+use App\Models\Route;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -11,20 +14,45 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class PostFactory extends Factory
 {
     /**
-     * Define the model's default state.
-     *
      * @return array<string, mixed>
      */
     public function definition(): array
     {
         return [
-            'user_id' => \App\Models\User::factory(),
+            'user_id' => User::factory(),
             'content' => fake()->paragraph(),
-            'type' => fake()->randomElement(['text', 'route_share', 'maintenance']),
-            'route_id' => fake()->optional(0.3)->randomElement(\App\Models\Route::pluck('id')->toArray()),
-            'maintenance_log_id' => fake()->optional(0.3)->randomElement(\App\Models\MaintenanceLog::pluck('id')->toArray()),
-            'likes_count' => fake()->numberBetween(0, 50),
-            'comments_count' => fake()->numberBetween(0, 20),
+            'type' => 'text',
+            'route_id' => null,
+            'maintenance_log_id' => null,
+            'likes_count' => 0,
+            'comments_count' => 0,
         ];
+    }
+
+    public function text(): static
+    {
+        return $this->state(fn (): array => [
+            'type' => 'text',
+            'route_id' => null,
+            'maintenance_log_id' => null,
+        ]);
+    }
+
+    public function routeShare(?Route $route = null): static
+    {
+        return $this->state(fn (): array => [
+            'type' => 'route_share',
+            'route_id' => $route?->id ?? Route::factory(),
+            'maintenance_log_id' => null,
+        ]);
+    }
+
+    public function maintenance(?MaintenanceLog $log = null): static
+    {
+        return $this->state(fn (): array => [
+            'type' => 'maintenance',
+            'maintenance_log_id' => $log?->id ?? MaintenanceLog::factory(),
+            'route_id' => null,
+        ]);
     }
 }

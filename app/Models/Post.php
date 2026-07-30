@@ -2,14 +2,23 @@
 
 namespace App\Models;
 
+use Database\Factories\PostFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Post extends Model
 {
-    /** @use HasFactory<\Database\Factories\PostFactory> */
+    /** @use HasFactory<PostFactory> */
     use HasFactory;
+
+    public function scopeForFeed(Builder $query): Builder
+    {
+        return $query
+            ->with(['user', 'route', 'maintenanceLog'])
+            ->latest();
+    }
 
     protected $fillable = [
         'user_id',
@@ -43,7 +52,7 @@ class Post extends Model
 
     public function getFormattedTypeAttribute(): string
     {
-        return match($this->type) {
+        return match ($this->type) {
             'text' => 'Text Post',
             'route_share' => 'Route Share',
             'maintenance' => 'Maintenance Update',
@@ -53,9 +62,9 @@ class Post extends Model
 
     public function getDisplayContentAttribute(): string
     {
-        return match($this->type) {
-            'route_share' => $this->content . ($this->route ? " 📍 {$this->route->name}" : ''),
-            'maintenance' => $this->content . ($this->maintenanceLog ? " 🔧 {$this->maintenanceLog->title}" : ''),
+        return match ($this->type) {
+            'route_share' => $this->content.($this->route ? " 📍 {$this->route->name}" : ''),
+            'maintenance' => $this->content.($this->maintenanceLog ? " 🔧 {$this->maintenanceLog->title}" : ''),
             default => $this->content,
         };
     }
