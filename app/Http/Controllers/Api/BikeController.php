@@ -3,100 +3,50 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\StoreBikeRequest;
+use App\Http\Requests\Api\UpdateBikeRequest;
+use App\Http\Resources\BikeResource;
 use App\Models\Bike;
-use Illuminate\Http\Request;
+use App\Services\BikeService;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
 
 class BikeController extends Controller
 {
-    public function index()
-    {
-        $bikes = Bike::with(['user', 'maintenanceLogs'])->get();
+    public function __construct(private readonly BikeService $bikeService) {}
 
-        return response()->json([
-            'success' => true,
-            'data' => $bikes->map(function ($bike) {
-                return [
-                    'id' => $bike->id,
-                    'brand' => $bike->brand,
-                    'model' => $bike->model,
-                    'year' => $bike->year,
-                    'km_current' => $bike->km_current,
-                    'image_url' => $bike->image_url,
-                    'description' => $bike->description,
-                    'user' => [
-                        'id' => $bike->user->id,
-                        'name' => $bike->user->name,
-                    ],
-                    'maintenance_logs_count' => $bike->maintenanceLogs->count(),
-                    'created_at' => $bike->created_at,
-                ];
-            }),
-        ]);
+    public function index(): AnonymousResourceCollection
+    {
+        $bikes = Bike::query()
+            ->with('user')
+            ->withCount('maintenanceLogs')
+            ->latest()
+            ->paginate(25);
+
+        return BikeResource::collection($bikes);
     }
 
-    public function store(Request $request)
+    public function store(StoreBikeRequest $request): BikeResource
     {
-        $validated = $request->validate([
-            'brand' => 'required|string|max:255',
-            'model' => 'required|string|max:255',
-            'year' => 'nullable|integer|min:1900|max:'.date('Y'),
-            'km_current' => 'nullable|integer|min:0',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        $bike = $this->bikeService->create($request->user(), $request->validated());
 
-        $validated['user_id'] = auth()->id();
-
-        $bike = Bike::create($validated);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Bike created successfully',
-            'data' => $bike,
-        ], 201);
+        return new BikeResource($bike->load('user'));
     }
 
-    public function update(Request $request, Bike $bike)
+    public function update(UpdateBikeRequest $request, Bike $bike): BikeResource
     {
-        if ($bike->user_id !== auth()->id()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized',
-            ], 403);
-        }
+        $bike = $this->bikeService->update($bike, $request->validated());
 
-        $validated = $request->validate([
-            'brand' => 'sometimes|required|string|max:255',
-            'model' => 'sometimes|required|string|max:255',
-            'year' => 'sometimes|nullable|integer|min:1900|max:'.date('Y'),
-            'km_current' => 'sometimes|nullable|integer|min:0',
-            'description' => 'sometimes|nullable|string',
-            'image' => 'sometimes|nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-
-        $bike->update($validated);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Bike updated successfully',
-            'data' => $bike,
-        ]);
+        return new BikeResource($bike->load('user'));
     }
 
-    public function destroy(Bike $bike)
+    public function destroy(Bike $bike): Response
     {
-        if ($bike->user_id !== auth()->id()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized',
-            ], 403);
-        }
+        Gate::authorize('delete', $bike);
 
         $bike->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Bike deleted successfully',
-        ]);
+        return response()->noContent();
     }
 }
