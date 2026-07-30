@@ -1,11 +1,16 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RouteController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/routes/{route}', [RouteController::class, 'show'])
+    ->middleware(['throttle:60,1', 'route-map-csp'])
+    ->name('routes.show');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

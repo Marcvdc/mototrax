@@ -11,13 +11,18 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ViewEntry;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\View as ViewComponent;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
@@ -77,6 +82,47 @@ class RouteResource extends Resource
                     ->numeric()
                     ->disabled()
                     ->dehydrated(),
+                ViewComponent::make('filament.route.map-preview')
+                    ->visible(fn (?string $operation): bool => $operation !== 'create')
+                    ->columnSpanFull(),
+            ]);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                TextEntry::make('user.name')->label('Eigenaar'),
+                TextEntry::make('name')->label('Naam'),
+                TextEntry::make('description')
+                    ->label('Beschrijving')
+                    ->placeholder('—')
+                    ->columnSpanFull(),
+                IconEntry::make('is_public')
+                    ->label('Publiek zichtbaar')
+                    ->boolean(),
+                TextEntry::make('difficulty')
+                    ->label('Niveau')
+                    ->formatStateUsing(fn ($state) => Route::getDifficultyLevels()[$state] ?? '—'),
+                TextEntry::make('distance')
+                    ->label('Afstand')
+                    ->formatStateUsing(fn ($state) => $state ? number_format($state, 1).' km' : '—'),
+                TextEntry::make('estimated_time')
+                    ->label('Geschatte tijd')
+                    ->formatStateUsing(fn ($record) => $record->estimated_time ? $record->formatted_time : '—'),
+                TextEntry::make('waypoint_count')
+                    ->label('Waypoints')
+                    ->placeholder('—'),
+                TextEntry::make('tags')
+                    ->label('Tags')
+                    ->formatStateUsing(fn ($state) => collect((array) $state)
+                        ->map(fn ($t) => Route::getCommonTags()[$t] ?? $t)
+                        ->join(', ') ?: '—')
+                    ->columnSpanFull(),
+                ViewEntry::make('map')
+                    ->label('')
+                    ->view('filament.route.map-preview')
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -116,6 +162,7 @@ class RouteResource extends Resource
                     ->label('Publiek'),
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
                 Action::make('download_gpx')
@@ -141,6 +188,7 @@ class RouteResource extends Resource
         return [
             'index' => Pages\ListRoutes::route('/'),
             'create' => Pages\CreateRoute::route('/create'),
+            'view' => Pages\ViewRoute::route('/{record}'),
             'edit' => Pages\EditRoute::route('/{record}/edit'),
         ];
     }
