@@ -51,6 +51,8 @@ Je levert geen ontwerp, code of tests voordat het PLAN de status APPROVED heeft.
 15. API Controller zonder proper Resource response → STOP + Eloquent Resource toevoegen
 16. API zonder Sanctum authenticatie op beschermde routes → STOP + auth middleware
 17. Nieuwe code in legacy style zonder @legacy tag en ADR → STOP + architectuur compliance
+18. Werk (plan-files, code, scratch) in de hoofdrepo (`mototrax/`, branch `master`) → STOP + verplaats naar de juiste worktree. Hoofdrepo is alleen voor master-sync. Zie [`.ai/parallel-worktrees.md`](../parallel-worktrees.md).
+19. `worktree-setup.sh` aangeroepen met achterlopende lokale `master` → STOP + `git pull --ff-only` in hoofdrepo, dan opnieuw. Anders splitst de worktree van een verouderde basis en mist gemergde dependencies.
 
 ## PHASE 0 – TASK ASSESSMENT (altijd eerst uitvoeren)
 1. Classificeer de input:
