@@ -29,20 +29,22 @@ class FeedService
      */
     public function createPost(User $author, array $data): Post
     {
-        return DB::transaction(function () use ($author, $data): Post {
-            $post = $author->posts()->create([
+        $post = DB::transaction(function () use ($author, $data): Post {
+            return $author->posts()->create([
                 'content' => $data['content'],
                 'type' => $data['type'],
                 'route_id' => $data['route_id'] ?? null,
                 'maintenance_log_id' => $data['maintenance_log_id'] ?? null,
             ]);
-
-            if ($post->type === 'route_share' && $post->route_id !== null) {
-                $this->dispatchRouteShared($post, $author);
-            }
-
-            return $post;
         });
+
+        // Dispatch pas ná commit: met de database-queue (after_commit=false) zou een
+        // worker de job anders kunnen oppakken vóór de Post gecommit is → ModelNotFound.
+        if ($post->type === 'route_share' && $post->route_id !== null) {
+            $this->dispatchRouteShared($post, $author);
+        }
+
+        return $post;
     }
 
     private function dispatchRouteShared(Post $post, User $actor): void

@@ -1,4 +1,4 @@
-# ADR 0002 — Notification fanout naar alle users
+# ADR 0003 — Notification fanout naar alle users
 
 - **Status:** Accepted
 - **Datum:** 2026-05-10

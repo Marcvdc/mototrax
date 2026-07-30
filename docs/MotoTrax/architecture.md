@@ -63,7 +63,7 @@ GET /api/feed  (Sanctum auth)
 }
 ```
 
-Zie ook [ADR 0002](adr/0002-notification-fanout-all-users.md) voor de fanout-keuze.
+Zie ook [ADR 0003](adr/0003-notification-fanout-all-users.md) voor de fanout-keuze.
 
 ---
 
