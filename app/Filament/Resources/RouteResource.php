@@ -168,7 +168,7 @@ class RouteResource extends Resource
                 Action::make('download_gpx')
                     ->label('Download GPX')
                     ->icon('heroicon-o-arrow-down-tray')
-                    ->url(fn (Route $record): string => route('api.routes.gpx', ['route' => $record->id]))
+                    ->url(fn (Route $record): string => route('api.v1.routes.gpx', ['route' => $record->id]))
                     ->openUrlInNewTab(),
             ])
             ->bulkActions([

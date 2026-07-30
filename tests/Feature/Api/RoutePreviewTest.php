@@ -24,7 +24,7 @@ class RoutePreviewTest extends TestCase
     {
         $route = $this->createRouteWithGpx(isPublic: true);
 
-        $this->getJson("/api/routes/{$route->id}")
+        $this->getJson("/api/v1/routes/{$route->id}")
             ->assertOk()
             ->assertJsonPath('data.id', $route->id)
             ->assertJsonPath('track.type', 'Feature')
@@ -38,7 +38,7 @@ class RoutePreviewTest extends TestCase
         $stranger = User::factory()->create();
 
         $this->actingAs($stranger, 'sanctum')
-            ->getJson("/api/routes/{$route->id}")
+            ->getJson("/api/v1/routes/{$route->id}")
             ->assertStatus(403);
     }
 
@@ -47,7 +47,7 @@ class RoutePreviewTest extends TestCase
         $route = $this->createRouteWithGpx(isPublic: false);
 
         $this->actingAs($route->user, 'sanctum')
-            ->getJson("/api/routes/{$route->id}")
+            ->getJson("/api/v1/routes/{$route->id}")
             ->assertOk()
             ->assertJsonPath('data.id', $route->id);
     }
@@ -56,12 +56,12 @@ class RoutePreviewTest extends TestCase
     {
         $route = $this->createRouteWithGpx(isPublic: false);
 
-        $this->getJson("/api/routes/{$route->id}")->assertStatus(403);
+        $this->getJson("/api/v1/routes/{$route->id}")->assertStatus(403);
     }
 
     public function test_unknown_route_returns_404(): void
     {
-        $this->getJson('/api/routes/9999')->assertStatus(404);
+        $this->getJson('/api/v1/routes/9999')->assertStatus(404);
     }
 
     public function test_index_returns_only_public_routes_for_anonymous(): void
@@ -70,7 +70,7 @@ class RoutePreviewTest extends TestCase
         $publicTwo = Route::factory()->public()->create();
         $privateRoute = Route::factory()->create(['is_public' => false]);
 
-        $response = $this->getJson('/api/routes')->assertOk();
+        $response = $this->getJson('/api/v1/routes')->assertOk();
 
         $ids = collect($response->json('data'))->pluck('id')->all();
         $this->assertContains($publicOne->id, $ids);
@@ -88,7 +88,7 @@ class RoutePreviewTest extends TestCase
         $privateOther = Route::factory()->create(['user_id' => $stranger->id, 'is_public' => false]);
 
         $ids = collect(
-            $this->actingAs($owner, 'sanctum')->getJson('/api/routes')->assertOk()->json('data')
+            $this->actingAs($owner, 'sanctum')->getJson('/api/v1/routes')->assertOk()->json('data')
         )->pluck('id')->all();
 
         $this->assertContains($publicOther->id, $ids);

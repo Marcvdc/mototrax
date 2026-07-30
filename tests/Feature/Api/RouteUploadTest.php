@@ -22,14 +22,14 @@ class RouteUploadTest extends TestCase
 
     public function test_unauthenticated_upload_is_rejected(): void
     {
-        $this->postJson('/api/routes', [])->assertStatus(401);
+        $this->postJson('/api/v1/routes', [])->assertStatus(401);
     }
 
     public function test_authenticated_upload_persists_route_and_parses_metadata(): void
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user, 'sanctum')->postJson('/api/routes', [
+        $response = $this->actingAs($user, 'sanctum')->postJson('/api/v1/routes', [
             'gpx_file' => $this->fixtureUpload('sample-track.gpx'),
             'name' => 'Mijn rondje',
             'is_public' => true,
@@ -51,7 +51,7 @@ class RouteUploadTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user, 'sanctum')->postJson('/api/routes', [
+        $this->actingAs($user, 'sanctum')->postJson('/api/v1/routes', [
             'name' => 'No file',
         ])->assertStatus(422)->assertJsonValidationErrors('gpx_file');
     }
@@ -62,7 +62,7 @@ class RouteUploadTest extends TestCase
 
         $bogus = UploadedFile::fake()->create('not-gpx.png', 10, 'image/png');
 
-        $this->actingAs($user, 'sanctum')->postJson('/api/routes', [
+        $this->actingAs($user, 'sanctum')->postJson('/api/v1/routes', [
             'gpx_file' => $bogus,
         ])->assertStatus(422)->assertJsonValidationErrors('gpx_file');
     }
@@ -71,7 +71,7 @@ class RouteUploadTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user, 'sanctum')->postJson('/api/routes', [
+        $response = $this->actingAs($user, 'sanctum')->postJson('/api/v1/routes', [
             'gpx_file' => $this->fixtureUpload('empty.gpx'),
         ]);
 
@@ -82,7 +82,7 @@ class RouteUploadTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user, 'sanctum')->postJson('/api/routes', [
+        $this->actingAs($user, 'sanctum')->postJson('/api/v1/routes', [
             'gpx_file' => $this->fixtureUpload('sample-track.gpx'),
             'difficulty' => 'extreme',
         ])->assertStatus(422)->assertJsonValidationErrors('difficulty');

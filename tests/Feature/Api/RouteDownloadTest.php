@@ -24,7 +24,7 @@ class RouteDownloadTest extends TestCase
     {
         $route = $this->createRouteWithGpx(isPublic: true);
 
-        $response = $this->get("/api/routes/{$route->id}/gpx");
+        $response = $this->get("/api/v1/routes/{$route->id}/gpx");
 
         $response->assertOk();
         $this->assertSame('application/gpx+xml', $response->headers->get('content-type'));
@@ -36,7 +36,7 @@ class RouteDownloadTest extends TestCase
         $stranger = User::factory()->create();
 
         $this->actingAs($stranger, 'sanctum')
-            ->get("/api/routes/{$route->id}/gpx")
+            ->get("/api/v1/routes/{$route->id}/gpx")
             ->assertStatus(403);
     }
 
@@ -45,7 +45,7 @@ class RouteDownloadTest extends TestCase
         $route = $this->createRouteWithGpx(isPublic: false);
 
         $this->actingAs($route->user, 'sanctum')
-            ->get("/api/routes/{$route->id}/gpx")
+            ->get("/api/v1/routes/{$route->id}/gpx")
             ->assertOk();
     }
 
@@ -54,7 +54,7 @@ class RouteDownloadTest extends TestCase
         $route = $this->createRouteWithGpx(isPublic: true);
         Storage::disk(RouteService::DISK)->delete($route->gpx_file);
 
-        $this->getJson("/api/routes/{$route->id}/gpx")->assertStatus(404);
+        $this->getJson("/api/v1/routes/{$route->id}/gpx")->assertStatus(404);
     }
 
     public function test_destroy_removes_gpx_file_from_storage(): void
@@ -63,7 +63,7 @@ class RouteDownloadTest extends TestCase
         Storage::disk(RouteService::DISK)->assertExists($route->gpx_file);
 
         $this->actingAs($route->user, 'sanctum')
-            ->deleteJson("/api/routes/{$route->id}")
+            ->deleteJson("/api/v1/routes/{$route->id}")
             ->assertOk();
 
         Storage::disk(RouteService::DISK)->assertMissing($route->gpx_file);
@@ -76,7 +76,7 @@ class RouteDownloadTest extends TestCase
         $stranger = User::factory()->create();
 
         $this->actingAs($stranger, 'sanctum')
-            ->putJson("/api/routes/{$route->id}", ['name' => 'hacked'])
+            ->putJson("/api/v1/routes/{$route->id}", ['name' => 'hacked'])
             ->assertStatus(403);
     }
 

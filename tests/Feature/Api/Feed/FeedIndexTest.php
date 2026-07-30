@@ -14,7 +14,7 @@ class FeedIndexTest extends TestCase
 
     public function test_unauthenticated_request_returns_401(): void
     {
-        $this->getJson('/api/feed')->assertStatus(401);
+        $this->getJson('/api/v1/feed')->assertStatus(401);
     }
 
     public function test_returns_paginated_list_descending_by_created_at(): void
@@ -31,7 +31,7 @@ class FeedIndexTest extends TestCase
             'created_at' => now()->subMinutes(5),
         ]);
 
-        $response = $this->actingAs($viewer, 'sanctum')->getJson('/api/feed');
+        $response = $this->actingAs($viewer, 'sanctum')->getJson('/api/v1/feed');
 
         $response->assertOk()
             ->assertJsonStructure(['data', 'links', 'meta'])
@@ -44,12 +44,12 @@ class FeedIndexTest extends TestCase
         $viewer = User::factory()->create();
         Post::factory()->count(15)->text()->create(['user_id' => $viewer->id]);
 
-        $this->actingAs($viewer, 'sanctum')->getJson('/api/feed?per_page=10')
+        $this->actingAs($viewer, 'sanctum')->getJson('/api/v1/feed?per_page=10')
             ->assertOk()
             ->assertJsonPath('meta.per_page', 10)
             ->assertJsonCount(10, 'data');
 
-        $this->actingAs($viewer, 'sanctum')->getJson('/api/feed?per_page=999')
+        $this->actingAs($viewer, 'sanctum')->getJson('/api/v1/feed?per_page=999')
             ->assertOk()
             ->assertJsonPath('meta.per_page', 25);
     }
@@ -66,7 +66,7 @@ class FeedIndexTest extends TestCase
             'user_id' => $owner->id,
         ]);
 
-        $response = $this->actingAs($viewer, 'sanctum')->getJson('/api/feed');
+        $response = $this->actingAs($viewer, 'sanctum')->getJson('/api/v1/feed');
 
         $response->assertOk()
             ->assertJsonPath('data.0.id', $post->id)
@@ -83,7 +83,7 @@ class FeedIndexTest extends TestCase
         ]);
         Post::factory()->routeShare($publicRoute)->create(['user_id' => $owner->id]);
 
-        $response = $this->actingAs($viewer, 'sanctum')->getJson('/api/feed');
+        $response = $this->actingAs($viewer, 'sanctum')->getJson('/api/v1/feed');
 
         $response->assertOk()
             ->assertJsonPath('data.0.route.id', $publicRoute->id)
@@ -99,7 +99,7 @@ class FeedIndexTest extends TestCase
         ]);
         Post::factory()->routeShare($privateRoute)->create(['user_id' => $owner->id]);
 
-        $response = $this->actingAs($owner, 'sanctum')->getJson('/api/feed');
+        $response = $this->actingAs($owner, 'sanctum')->getJson('/api/v1/feed');
 
         $response->assertOk()
             ->assertJsonPath('data.0.route.id', $privateRoute->id)

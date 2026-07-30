@@ -15,7 +15,7 @@ class PostDestroyTest extends TestCase
     {
         $post = Post::factory()->text()->create(['user_id' => User::factory()->create()->id]);
 
-        $this->deleteJson("/api/posts/{$post->id}")->assertStatus(401);
+        $this->deleteJson("/api/v1/posts/{$post->id}")->assertStatus(401);
     }
 
     public function test_owner_can_delete_own_post(): void
@@ -23,7 +23,7 @@ class PostDestroyTest extends TestCase
         $author = User::factory()->create();
         $post = Post::factory()->text()->create(['user_id' => $author->id]);
 
-        $this->actingAs($author, 'sanctum')->deleteJson("/api/posts/{$post->id}")
+        $this->actingAs($author, 'sanctum')->deleteJson("/api/v1/posts/{$post->id}")
             ->assertOk();
 
         $this->assertDatabaseMissing('posts', ['id' => $post->id]);
@@ -35,7 +35,7 @@ class PostDestroyTest extends TestCase
         $other = User::factory()->create();
         $post = Post::factory()->text()->create(['user_id' => $author->id]);
 
-        $this->actingAs($other, 'sanctum')->deleteJson("/api/posts/{$post->id}")
+        $this->actingAs($other, 'sanctum')->deleteJson("/api/v1/posts/{$post->id}")
             ->assertStatus(403);
 
         $this->assertDatabaseHas('posts', ['id' => $post->id]);

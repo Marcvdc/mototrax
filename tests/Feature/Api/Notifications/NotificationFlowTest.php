@@ -21,14 +21,14 @@ class NotificationFlowTest extends TestCase
 
     public function test_unauthenticated_index_returns_401(): void
     {
-        $this->getJson('/api/notifications')->assertStatus(401);
+        $this->getJson('/api/v1/notifications')->assertStatus(401);
     }
 
     public function test_index_returns_empty_collection_when_no_notifications(): void
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user, 'sanctum')->getJson('/api/notifications')
+        $this->actingAs($user, 'sanctum')->getJson('/api/v1/notifications')
             ->assertOk()
             ->assertJsonCount(0, 'data');
     }
@@ -42,7 +42,7 @@ class NotificationFlowTest extends TestCase
 
         $recipient->notify(new RouteSharedNotification($post, $route, $author));
 
-        $response = $this->actingAs($recipient, 'sanctum')->getJson('/api/notifications');
+        $response = $this->actingAs($recipient, 'sanctum')->getJson('/api/v1/notifications');
 
         $response->assertOk()
             ->assertJsonCount(1, 'data')
@@ -63,7 +63,7 @@ class NotificationFlowTest extends TestCase
         $this->assertNull($notification->read_at);
 
         $this->actingAs($recipient, 'sanctum')
-            ->postJson("/api/notifications/{$notification->id}/read")
+            ->postJson("/api/v1/notifications/{$notification->id}/read")
             ->assertOk();
 
         $this->assertNotNull($recipient->notifications()->firstOrFail()->read_at);
@@ -81,7 +81,7 @@ class NotificationFlowTest extends TestCase
         $this->assertSame(2, $recipient->unreadNotifications()->count());
 
         $this->actingAs($recipient, 'sanctum')
-            ->postJson('/api/notifications/read-all')
+            ->postJson('/api/v1/notifications/read-all')
             ->assertOk();
 
         $this->assertSame(0, $recipient->refresh()->unreadNotifications()->count());
@@ -99,7 +99,7 @@ class NotificationFlowTest extends TestCase
         $notification = $recipient->notifications()->firstOrFail();
 
         $this->actingAs($intruder, 'sanctum')
-            ->postJson("/api/notifications/{$notification->id}/read")
+            ->postJson("/api/v1/notifications/{$notification->id}/read")
             ->assertStatus(404);
     }
 }
