@@ -65,7 +65,7 @@ class PostResource extends JsonResource
             'name' => $route->name,
             'is_public' => $route->is_public,
             'distance_km' => (float) $route->distance,
-            'preview_url' => route('api.routes.show', ['route' => $route->id]),
+            'preview_url' => route('api.v1.routes.show', ['route' => $route->id]),
         ];
     }
 }

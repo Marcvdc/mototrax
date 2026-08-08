@@ -17,7 +17,7 @@ class PostStoreTest extends TestCase
 
     public function test_unauthenticated_post_creation_returns_401(): void
     {
-        $this->postJson('/api/posts', [])->assertStatus(401);
+        $this->postJson('/api/v1/posts', [])->assertStatus(401);
     }
 
     public function test_text_post_happy_path(): void
@@ -25,7 +25,7 @@ class PostStoreTest extends TestCase
         Notification::fake();
         $author = User::factory()->create();
 
-        $response = $this->actingAs($author, 'sanctum')->postJson('/api/posts', [
+        $response = $this->actingAs($author, 'sanctum')->postJson('/api/v1/posts', [
             'content' => 'Net afgereden',
             'type' => 'text',
         ]);
@@ -45,7 +45,7 @@ class PostStoreTest extends TestCase
         $other = User::factory()->create();
         $route = Route::factory()->create(['user_id' => $author->id, 'is_public' => true]);
 
-        $response = $this->actingAs($author, 'sanctum')->postJson('/api/posts', [
+        $response = $this->actingAs($author, 'sanctum')->postJson('/api/v1/posts', [
             'content' => 'Mooie rit!',
             'type' => 'route_share',
             'route_id' => $route->id,
@@ -66,7 +66,7 @@ class PostStoreTest extends TestCase
         $owner = User::factory()->create();
         $route = Route::factory()->create(['user_id' => $owner->id, 'is_public' => true]);
 
-        $this->actingAs($author, 'sanctum')->postJson('/api/posts', [
+        $this->actingAs($author, 'sanctum')->postJson('/api/v1/posts', [
             'content' => 'Tip van een andere rider',
             'type' => 'route_share',
             'route_id' => $route->id,
@@ -81,7 +81,7 @@ class PostStoreTest extends TestCase
         $author = User::factory()->create();
         $route = Route::factory()->create(['user_id' => $author->id, 'is_public' => false]);
 
-        $this->actingAs($author, 'sanctum')->postJson('/api/posts', [
+        $this->actingAs($author, 'sanctum')->postJson('/api/v1/posts', [
             'content' => 'Probeer te sharen',
             'type' => 'route_share',
             'route_id' => $route->id,
@@ -94,7 +94,7 @@ class PostStoreTest extends TestCase
     {
         $author = User::factory()->create();
 
-        $this->actingAs($author, 'sanctum')->postJson('/api/posts', [
+        $this->actingAs($author, 'sanctum')->postJson('/api/v1/posts', [
             'content' => 'Geen route',
             'type' => 'route_share',
         ])->assertStatus(422)->assertJsonValidationErrors('route_id');
@@ -104,7 +104,7 @@ class PostStoreTest extends TestCase
     {
         $author = User::factory()->create();
 
-        $this->actingAs($author, 'sanctum')->postJson('/api/posts', [
+        $this->actingAs($author, 'sanctum')->postJson('/api/v1/posts', [
             'content' => str_repeat('a', 2001),
             'type' => 'text',
         ])->assertStatus(422)->assertJsonValidationErrors('content');
@@ -114,7 +114,7 @@ class PostStoreTest extends TestCase
     {
         $author = User::factory()->create();
 
-        $this->actingAs($author, 'sanctum')->postJson('/api/posts', [
+        $this->actingAs($author, 'sanctum')->postJson('/api/v1/posts', [
             'content' => 'Hallo',
             'type' => 'shouting',
         ])->assertStatus(422)->assertJsonValidationErrors('type');
@@ -129,7 +129,7 @@ class PostStoreTest extends TestCase
             'bike_id' => $bike->id,
         ]);
 
-        $this->actingAs($author, 'sanctum')->postJson('/api/posts', [
+        $this->actingAs($author, 'sanctum')->postJson('/api/v1/posts', [
             'content' => 'Ketting gesmeerd',
             'type' => 'maintenance',
             'maintenance_log_id' => $log->id,
@@ -147,7 +147,7 @@ class PostStoreTest extends TestCase
             'bike_id' => $bike->id,
         ]);
 
-        $this->actingAs($author, 'sanctum')->postJson('/api/posts', [
+        $this->actingAs($author, 'sanctum')->postJson('/api/v1/posts', [
             'content' => 'Niet mijn log',
             'type' => 'maintenance',
             'maintenance_log_id' => $log->id,

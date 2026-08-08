@@ -174,3 +174,35 @@ Geconfigureerd via `config/map.php` (env-overrideable — zie ADR 0002):
 - Distance: haversine sum over `<trkpt>` met aardstraal 6371.0088 km.
 - Estimated time: prefereer `<time>`-stempels; bij ontbreken fallback op gemiddelde 60 km/u (`RouteService::DEFAULT_AVERAGE_SPEED_KMH`).
 - XML wordt geladen met `LIBXML_NONET` (geen externe entiteiten / netwerktoegang) ter bescherming tegen XXE.
+
+## API Layer (MVP-006)
+
+De REST API is geversioneerd onder `/api/v1` (route-namen `api.v1.*`; zie [ADR 0004](adr/0004-api-versioning-v1.md)). Alle responses lopen via Eloquent API Resources; foutresponses voor `api/*` worden als JSON gerenderd (`shouldRenderJsonWhen` in `bootstrap/app.php`).
+
+### Rate limiting
+- `RateLimiter::for('api')` — **60 req/min** per user (auth) of per IP (gast); geldt voor de hele `/api/v1`-groep.
+- `RateLimiter::for('api-write')` — **20 req/min** op alle schrijf-endpoints (POST/PUT/DELETE).
+- Overschrijding → `429` met `Retry-After` + `X-RateLimit-*` headers.
+
+### CORS
+- `config/cors.php` — `paths: ['api/*']`, `allowed_origins` env-gedreven (`CORS_ALLOWED_ORIGINS`, default `*`), token-based (`supports_credentials: false`).
+
+### Endpoints (`/api/v1`)
+
+| Methode | URI | Auth | Limiet |
+|--------:|-----|------|--------|
+| GET | `/users` | optioneel¹ | api |
+| GET | `/user` | Sanctum | api |
+| GET | `/bikes` | optioneel | api |
+| POST/PUT/DELETE | `/bikes[/{bike}]` | Sanctum | api-write |
+| GET | `/routes`, `/routes/{route}`, `/routes/{route}/gpx` | optioneel | api |
+| POST/PUT/DELETE | `/routes[/{route}]` | Sanctum | api-write |
+| GET | `/feed`, `/posts/{post}` | Sanctum | api |
+| POST/DELETE | `/posts[/{post}]` | Sanctum | api-write |
+| GET | `/notifications` | Sanctum | api |
+| POST | `/notifications/{id}/read`, `/notifications/read-all` | Sanctum | api-write |
+
+¹ `GET /users` lekt **geen** e-mailadressen: `email` verschijnt uitsluitend in het record van de ingelogde gebruiker zelf (`UserResource`).
+
+### Postman
+- Collectie: `docs/MotoTrax/api/mototrax.postman_collection.json` (zet `base_url` + `token`).

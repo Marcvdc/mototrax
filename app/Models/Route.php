@@ -65,7 +65,7 @@ class Route extends Model
 
     public function getGpxUrlAttribute(): string
     {
-        return route('api.routes.gpx', ['route' => $this->id]);
+        return route('api.v1.routes.gpx', ['route' => $this->id]);
     }
 
     public function getFormattedDistanceAttribute(): string

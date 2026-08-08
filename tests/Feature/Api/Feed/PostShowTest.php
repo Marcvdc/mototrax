@@ -16,7 +16,7 @@ class PostShowTest extends TestCase
     {
         $post = Post::factory()->text()->create(['user_id' => User::factory()->create()->id]);
 
-        $this->getJson("/api/posts/{$post->id}")->assertStatus(401);
+        $this->getJson("/api/v1/posts/{$post->id}")->assertStatus(401);
     }
 
     public function test_returns_own_post(): void
@@ -24,7 +24,7 @@ class PostShowTest extends TestCase
         $author = User::factory()->create();
         $post = Post::factory()->text()->create(['user_id' => $author->id]);
 
-        $this->actingAs($author, 'sanctum')->getJson("/api/posts/{$post->id}")
+        $this->actingAs($author, 'sanctum')->getJson("/api/v1/posts/{$post->id}")
             ->assertOk()
             ->assertJsonPath('data.id', $post->id);
     }
@@ -35,7 +35,7 @@ class PostShowTest extends TestCase
         $author = User::factory()->create();
         $post = Post::factory()->text()->create(['user_id' => $author->id]);
 
-        $this->actingAs($viewer, 'sanctum')->getJson("/api/posts/{$post->id}")
+        $this->actingAs($viewer, 'sanctum')->getJson("/api/v1/posts/{$post->id}")
             ->assertOk()
             ->assertJsonPath('data.id', $post->id);
     }
@@ -50,7 +50,7 @@ class PostShowTest extends TestCase
         ]);
         $post = Post::factory()->routeShare($privateRoute)->create(['user_id' => $owner->id]);
 
-        $this->actingAs($viewer, 'sanctum')->getJson("/api/posts/{$post->id}")
+        $this->actingAs($viewer, 'sanctum')->getJson("/api/v1/posts/{$post->id}")
             ->assertOk()
             ->assertJsonPath('data.id', $post->id)
             ->assertJsonPath('data.route', null);
@@ -60,7 +60,7 @@ class PostShowTest extends TestCase
     {
         $viewer = User::factory()->create();
 
-        $this->actingAs($viewer, 'sanctum')->getJson('/api/posts/9999')
+        $this->actingAs($viewer, 'sanctum')->getJson('/api/v1/posts/9999')
             ->assertStatus(404);
     }
 }

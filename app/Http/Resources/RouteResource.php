@@ -37,8 +37,8 @@ class RouteResource extends JsonResource
                 'lat' => (float) $this->end_lat,
                 'lng' => (float) $this->end_lng,
             ]),
-            'gpx_url' => route('api.routes.gpx', ['route' => $this->id]),
-            'preview_url' => route('api.routes.show', ['route' => $this->id]),
+            'gpx_url' => route('api.v1.routes.gpx', ['route' => $this->id]),
+            'preview_url' => route('api.v1.routes.show', ['route' => $this->id]),
             'user' => [
                 'id' => $this->user->id,
                 'name' => $this->user->name,

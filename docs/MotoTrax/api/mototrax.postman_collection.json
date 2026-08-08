@@ -1,0 +1,149 @@
+{
+  "info": {
+    "name": "MotoTrax API v1",
+    "description": "REST API voor het MotoTrax-platform. Auth via Laravel Sanctum (Bearer token). Zet `base_url` en `token` als collection-variabelen.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8080/api/v1" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "List users",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/users", "host": ["{{base_url}}"], "path": ["users"] } }
+        },
+        {
+          "name": "Current user",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/user", "host": ["{{base_url}}"], "path": ["user"] } }
+        }
+      ]
+    },
+    {
+      "name": "Bikes",
+      "item": [
+        {
+          "name": "List bikes",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/bikes", "host": ["{{base_url}}"], "path": ["bikes"] } }
+        },
+        {
+          "name": "Create bike",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"brand\": \"Honda\",\n  \"model\": \"CB500X\",\n  \"year\": 2022,\n  \"km_current\": 1000,\n  \"description\": \"Adventure tourer\"\n}" },
+            "url": { "raw": "{{base_url}}/bikes", "host": ["{{base_url}}"], "path": ["bikes"] }
+          }
+        },
+        {
+          "name": "Update bike",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"km_current\": 5000\n}" },
+            "url": { "raw": "{{base_url}}/bikes/1", "host": ["{{base_url}}"], "path": ["bikes", "1"] }
+          }
+        },
+        {
+          "name": "Delete bike",
+          "request": { "method": "DELETE", "url": { "raw": "{{base_url}}/bikes/1", "host": ["{{base_url}}"], "path": ["bikes", "1"] } }
+        }
+      ]
+    },
+    {
+      "name": "Routes",
+      "item": [
+        {
+          "name": "List routes",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/routes", "host": ["{{base_url}}"], "path": ["routes"] } }
+        },
+        {
+          "name": "Show route (+ GeoJSON preview)",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/routes/1", "host": ["{{base_url}}"], "path": ["routes", "1"] } }
+        },
+        {
+          "name": "Download GPX",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/routes/1/gpx", "host": ["{{base_url}}"], "path": ["routes", "1", "gpx"] } }
+        },
+        {
+          "name": "Upload route (GPX)",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Ardennen rondje", "type": "text" },
+                { "key": "is_public", "value": "1", "type": "text" },
+                { "key": "gpx_file", "type": "file", "src": [] }
+              ]
+            },
+            "url": { "raw": "{{base_url}}/routes", "host": ["{{base_url}}"], "path": ["routes"] }
+          }
+        },
+        {
+          "name": "Update route",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Nieuwe naam\",\n  \"is_public\": true\n}" },
+            "url": { "raw": "{{base_url}}/routes/1", "host": ["{{base_url}}"], "path": ["routes", "1"] }
+          }
+        },
+        {
+          "name": "Delete route",
+          "request": { "method": "DELETE", "url": { "raw": "{{base_url}}/routes/1", "host": ["{{base_url}}"], "path": ["routes", "1"] } }
+        }
+      ]
+    },
+    {
+      "name": "Feed & Posts",
+      "item": [
+        {
+          "name": "Feed",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/feed", "host": ["{{base_url}}"], "path": ["feed"] } }
+        },
+        {
+          "name": "Show post",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/posts/1", "host": ["{{base_url}}"], "path": ["posts", "1"] } }
+        },
+        {
+          "name": "Create post (route share)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"type\": \"route_share\",\n  \"content\": \"Mooie rit vandaag!\",\n  \"route_id\": 1\n}" },
+            "url": { "raw": "{{base_url}}/posts", "host": ["{{base_url}}"], "path": ["posts"] }
+          }
+        },
+        {
+          "name": "Delete post",
+          "request": { "method": "DELETE", "url": { "raw": "{{base_url}}/posts/1", "host": ["{{base_url}}"], "path": ["posts", "1"] } }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "List notifications",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/notifications", "host": ["{{base_url}}"], "path": ["notifications"] } }
+        },
+        {
+          "name": "Mark one read",
+          "request": { "method": "POST", "url": { "raw": "{{base_url}}/notifications/:id/read", "host": ["{{base_url}}"], "path": ["notifications", ":id", "read"] } }
+        },
+        {
+          "name": "Mark all read",
+          "request": { "method": "POST", "url": { "raw": "{{base_url}}/notifications/read-all", "host": ["{{base_url}}"], "path": ["notifications", "read-all"] } }
+        }
+      ]
+    }
+  ]
+}

@@ -8,34 +8,40 @@ use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::prefix('v1')->name('api.v1.')->middleware('throttle:api')->group(function () {
+    // Public read endpoints
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::get('/bikes', [BikeController::class, 'index'])->name('bikes.index');
 
-// Public read endpoints
-Route::get('/users', [UserController::class, 'index']);
-Route::get('/bikes', [BikeController::class, 'index']);
+    Route::get('/routes', [RouteController::class, 'index'])->name('routes.index');
+    Route::get('/routes/{route}', [RouteController::class, 'show'])->name('routes.show');
+    Route::get('/routes/{route}/gpx', [RouteController::class, 'download'])->name('routes.gpx');
 
-Route::get('/routes', [RouteController::class, 'index'])->name('api.routes.index');
-Route::get('/routes/{route}', [RouteController::class, 'show'])->name('api.routes.show');
-Route::get('/routes/{route}/gpx', [RouteController::class, 'download'])->name('api.routes.gpx');
+    // Authenticated read endpoints
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/user', function (Request $request) {
+            return $request->user();
+        })->name('user');
 
-// Protected (Sanctum) endpoints
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/bikes', [BikeController::class, 'store']);
-    Route::put('/bikes/{bike}', [BikeController::class, 'update']);
-    Route::delete('/bikes/{bike}', [BikeController::class, 'destroy']);
+        Route::get('/feed', [PostController::class, 'index'])->name('feed.index');
+        Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    });
 
-    Route::post('/routes', [RouteController::class, 'store'])->name('api.routes.store');
-    Route::put('/routes/{route}', [RouteController::class, 'update'])->name('api.routes.update');
-    Route::delete('/routes/{route}', [RouteController::class, 'destroy'])->name('api.routes.destroy');
+    // Authenticated write endpoints — stricter rate limit
+    Route::middleware(['auth:sanctum', 'throttle:api-write'])->group(function () {
+        Route::post('/bikes', [BikeController::class, 'store'])->name('bikes.store');
+        Route::put('/bikes/{bike}', [BikeController::class, 'update'])->name('bikes.update');
+        Route::delete('/bikes/{bike}', [BikeController::class, 'destroy'])->name('bikes.destroy');
 
-    Route::get('/feed', [PostController::class, 'index'])->name('api.feed.index');
-    Route::get('/posts/{post}', [PostController::class, 'show'])->name('api.posts.show');
-    Route::post('/posts', [PostController::class, 'store'])->name('api.posts.store');
-    Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('api.posts.destroy');
+        Route::post('/routes', [RouteController::class, 'store'])->name('routes.store');
+        Route::put('/routes/{route}', [RouteController::class, 'update'])->name('routes.update');
+        Route::delete('/routes/{route}', [RouteController::class, 'destroy'])->name('routes.destroy');
 
-    Route::get('/notifications', [NotificationController::class, 'index'])->name('api.notifications.index');
-    Route::post('/notifications/{id}/read', [NotificationController::class, 'markRead'])->name('api.notifications.read');
-    Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('api.notifications.read-all');
+        Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+        Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+
+        Route::post('/notifications/{id}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
+        Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
+    });
 });
