@@ -19,7 +19,7 @@ class MotoTraxSeeder extends Seeder
         // Create bikes for each user
         foreach ($users as $user) {
             $bikes = Bike::factory(rand(1, 3))->create(['user_id' => $user->id]);
-            
+
             // Create maintenance logs for each bike
             foreach ($bikes as $bike) {
                 MaintenanceLog::factory(rand(2, 8))->create([
@@ -27,10 +27,10 @@ class MotoTraxSeeder extends Seeder
                     'bike_id' => $bike->id,
                 ]);
             }
-            
+
             // Create routes for each user
             $routes = Route::factory(rand(2, 5))->create(['user_id' => $user->id]);
-            
+
             // Create posts for each user
             Post::factory(rand(3, 10))->create(['user_id' => $user->id]);
         }

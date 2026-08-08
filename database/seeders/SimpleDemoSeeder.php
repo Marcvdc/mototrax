@@ -19,7 +19,7 @@ class SimpleDemoSeeder extends Seeder
         foreach ($users as $user) {
             // Create 1-2 bikes per user
             $bikes = Bike::factory(rand(1, 2))->create(['user_id' => $user->id]);
-            
+
             // Create maintenance logs for bikes
             foreach ($bikes as $bike) {
                 MaintenanceLog::factory(rand(1, 3))->create([
@@ -27,10 +27,10 @@ class SimpleDemoSeeder extends Seeder
                     'bike_id' => $bike->id,
                 ]);
             }
-            
+
             // Create routes
             $routes = Route::factory(rand(1, 2))->create(['user_id' => $user->id]);
-            
+
             // Create posts
             Post::factory(rand(2, 4))->create(['user_id' => $user->id]);
         }

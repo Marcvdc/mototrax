@@ -5,22 +5,21 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\BikeResource\Pages;
 use App\Models\Bike;
 use BackedEnum;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
-use Filament\Support\Icons\Heroicon;
 use Filament\Schemas\Schema;
-use Filament\Tables;
-use Filament\Tables\Table;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
 
 class BikeResource extends Resource
 {
     protected static ?string $model = Bike::class;
 
-    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedCog6Tooth;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCog6Tooth;
 
     public static function form(Schema $schema): Schema
     {
@@ -68,7 +67,7 @@ class BikeResource extends Resource
                 TextColumn::make('km_current')
                     ->numeric()
                     ->sortable()
-                    ->formatStateUsing(fn ($state) => number_format($state) . ' km'),
+                    ->formatStateUsing(fn ($state) => number_format($state).' km'),
             ])
             ->filters([
                 //

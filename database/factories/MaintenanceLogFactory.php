@@ -2,7 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Bike;
 use App\Models\MaintenanceLog;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,8 +20,8 @@ class MaintenanceLogFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => \App\Models\User::factory(),
-            'bike_id' => \App\Models\Bike::factory(),
+            'user_id' => User::factory(),
+            'bike_id' => Bike::factory(),
             'title' => fake()->sentence(3),
             'type' => fake()->randomElement(['oil_change', 'tire_change', 'brake_service', 'chain_service', 'general_service', 'repair']),
             'description' => fake()->paragraph(),

@@ -4,14 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
     public function index()
     {
         $users = User::with(['bikes', 'routes', 'maintenanceLogs'])->get();
-        
+
         return response()->json([
             'success' => true,
             'data' => $users->map(function ($user) {
@@ -25,7 +24,7 @@ class UserController extends Controller
                     'total_km' => $user->total_km,
                     'created_at' => $user->created_at,
                 ];
-            })
+            }),
         ]);
     }
 }

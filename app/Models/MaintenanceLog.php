@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\MaintenanceLogFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MaintenanceLog extends Model
 {
-    /** @use HasFactory<\Database\Factories\MaintenanceLogFactory> */
+    /** @use HasFactory<MaintenanceLogFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -40,7 +41,7 @@ class MaintenanceLog extends Model
 
     public function getFormattedCostAttribute(): string
     {
-        return '€' . number_format($this->cost, 2, ',', '.');
+        return '€'.number_format($this->cost, 2, ',', '.');
     }
 
     public static function getMaintenanceTypes(): array

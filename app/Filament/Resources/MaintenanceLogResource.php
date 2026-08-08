@@ -5,6 +5,10 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\MaintenanceLogResource\Pages;
 use App\Models\MaintenanceLog;
 use BackedEnum;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -12,10 +16,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\EditAction;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -23,7 +23,7 @@ class MaintenanceLogResource extends Resource
 {
     protected static ?string $model = MaintenanceLog::class;
 
-    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedWrenchScrewdriver;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedWrenchScrewdriver;
 
     public static function form(Schema $schema): Schema
     {
@@ -79,7 +79,7 @@ class MaintenanceLogResource extends Resource
                 Tables\Columns\TextColumn::make('km_at_maintenance')
                     ->numeric()
                     ->sortable()
-                    ->formatStateUsing(fn ($state) => number_format($state) . ' km'),
+                    ->formatStateUsing(fn ($state) => number_format($state).' km'),
                 Tables\Columns\TextColumn::make('cost')
                     ->money('EUR')
                     ->sortable(),
