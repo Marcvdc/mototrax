@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Bike;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,7 +19,7 @@ class BikeFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => \App\Models\User::factory(),
+            'user_id' => User::factory(),
             'brand' => fake()->randomElement(['Yamaha', 'Honda', 'Kawasaki', 'Suzuki', 'Ducati', 'BMW', 'KTM', 'Harley-Davidson']),
             'model' => fake()->words(2, true),
             'year' => fake()->numberBetween(2015, 2024),

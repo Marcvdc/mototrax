@@ -11,7 +11,7 @@ class SimpleBikeSeeder extends Seeder
     public function run(): void
     {
         $user = User::first();
-        
+
         if ($user) {
             Bike::create([
                 'user_id' => $user->id,
@@ -21,7 +21,7 @@ class SimpleBikeSeeder extends Seeder
                 'km_current' => 5000,
                 'description' => 'Great bike for city riding',
             ]);
-            
+
             Bike::create([
                 'user_id' => $user->id,
                 'brand' => 'Honda',
