@@ -11,6 +11,20 @@ A motorcycle community platform built with Laravel 13 + Filament v5, featuring G
 - **Admin Panel**: Complete Filament admin interface
 - **API Ready**: RESTful API endpoints for mobile apps
 
+## 🎬 Demo
+
+Spin up the full stack with a seeded demo dataset (5 users, 9 bikes, 10 GPX routes, a live feed) in a few commands. Full walkthrough: **[docs/MotoTrax/deploy.md](docs/MotoTrax/deploy.md)**.
+
+Demo login: `admin@mototrax.dev` / `password` (admin) — riders `jan|sanne|youssef|emma@mototrax.dev`, all `password`.
+
+## 📸 Screenshots
+
+<!-- screenshots worden gegenereerd via de draaiende app (MVP-007, iteratie 3) -->
+
+| Feed | Routes | Admin |
+|------|--------|-------|
+| _(binnenkort)_ | _(binnenkort)_ | _(binnenkort)_ |
+
 ## 🐳 Docker Setup
 
 ### Quick Start
@@ -26,15 +40,17 @@ A motorcycle community platform built with Laravel 13 + Filament v5, featuring G
    docker-compose -f docker-compose.yml -f docker-compose.override.yml up -d --build
    ```
 
-3. **Run migrations and seed data:**
+3. **Run migrations and seed the demo data:**
    ```bash
-   docker-compose exec app php artisan migrate --seed
+   docker-compose exec app php artisan migrate:fresh --seed --force
    ```
 
 4. **Access the application:**
-   - Web App: http://localhost:8080
-   - Admin Panel: http://localhost:8080/admin
+   - Web App: http://localhost:18081
+   - Admin Panel: http://localhost:18081/admin
    - Database: localhost:5433
+
+> For a complete, reproducible demo bring-up (env, credentials, dataset, reset & troubleshooting) see **[docs/MotoTrax/deploy.md](docs/MotoTrax/deploy.md)**.
 
 ### Custom Ports
 
@@ -110,10 +126,15 @@ If you have multiple Docker apps running:
 
 ## 📱 API Endpoints
 
-- `/api/user` - User profile and data
-- `/api/bikes` - Motorcycle management
-- `/api/routes` - Route discovery and GPX downloads
-- `/api/maintenance` - Maintenance log tracking
+All API routes are versioned under `/api/v1` and protected with Sanctum (rate-limited, CORS-aware). See the Postman collection in [`docs/MotoTrax/api/`](docs/MotoTrax/api/).
+
+- `/api/v1/user` - Authenticated user profile
+- `/api/v1/users` - Riders directory
+- `/api/v1/bikes` - Motorcycle management
+- `/api/v1/routes` - Route discovery (`/routes/{route}/gpx` for GPX download)
+- `/api/v1/posts` - Social posts
+- `/api/v1/feed` - Timeline feed
+- `/api/v1/notifications` - Rider notifications
 
 ## 🤝 Contributing
 
