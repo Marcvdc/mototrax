@@ -30,10 +30,21 @@ export UID=$(id -u) GID=$(id -g)
 # 4. Stack bouwen en starten
 docker compose up -d --build
 
-# 5. App-sleutel genereren
+# 5. Storage schrijfbaar maken voor de app-user
+#    De named volume op storage/app/private is initieel root-owned; zonder deze stap
+#    kan de app geen GPX-bestanden wegschrijven en laden route-kaarten niet.
+docker compose run --rm --user root --no-deps --entrypoint sh app \
+  -c "chown -R $(id -u):$(id -g) storage/app/private bootstrap/cache"
+
+# 6. App-sleutel genereren
 docker compose exec app php artisan key:generate
 
-# 6. Database migreren + demo-data zaaien
+# 7. Frontend-assets bouwen (op de host; vereist Node 18+)
+#    De web-app (login/dashboard/route-kaart) heeft de Vite-manifest nodig.
+npm install
+npm run build
+
+# 8. Database migreren + demo-data zaaien
 docker compose exec app php artisan migrate:fresh --seed --force
 ```
 
@@ -88,3 +99,7 @@ docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build
   hebt gedraaid vóór `docker compose up`.
 - **`MissingAppKey` / 500** → `docker compose exec app php artisan key:generate` en herlaad.
 - **Web reageert niet** → `docker compose ps` en `docker compose logs nginx app` controleren.
+- **Routes tonen "Geen track beschikbaar" / geen kaart** → de storage was niet schrijfbaar bij het zaaien.
+  Draai stap 5 (chown) en zaai opnieuw met stap 7.
+- **500 op `/login` of admin** → frontend-assets niet gebouwd. Draai lokaal `npm install && npm run build`
+  (de `public/build/`-map met de Vite-manifest is vereist).

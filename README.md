@@ -19,11 +19,15 @@ Demo login: `admin@mototrax.dev` / `password` (admin) — riders `jan|sanne|yous
 
 ## 📸 Screenshots
 
-<!-- screenshots worden gegenereerd via de draaiende app (MVP-007, iteratie 3) -->
+**Route detail met interactieve kaart** (Leaflet + OpenStreetMap, GPX-track met start/finish):
 
-| Feed | Routes | Admin |
-|------|--------|-------|
-| _(binnenkort)_ | _(binnenkort)_ | _(binnenkort)_ |
+![Route detail met kaart](docs/screenshots/route-map.png)
+
+**Admin — routes** (Filament) &nbsp;·&nbsp; **Admin — feed/posts**
+
+| Routes | Feed |
+|--------|------|
+| ![Admin routes](docs/screenshots/admin-routes.png) | ![Admin posts](docs/screenshots/admin-posts.png) |
 
 ## 🐳 Docker Setup
 
