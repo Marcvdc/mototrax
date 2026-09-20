@@ -150,7 +150,7 @@ All API routes are versioned under `/api/v1` and protected with Sanctum (rate-li
 
 ## 📝 License
 
-This project is open-sourced software licensed under the MIT license.
+This project is open-sourced software licensed under the MIT license. See [LICENSE](LICENSE) for the full text.
 
 ## 🆘 Support
 
