@@ -39,17 +39,25 @@ Demo login: `admin@mototrax.dev` / `password` (admin) — riders `jan|sanne|yous
    cd mototrax
    ```
 
-2. **Start containers:**
+2. **Create the env file** (no edits needed, the stack sets its own database values):
+   ```bash
+   cp .env.example .env
+   ```
+
+3. **Start containers:**
    ```bash
    docker-compose -f docker-compose.yml -f docker-compose.override.yml up -d --build
    ```
 
-3. **Run migrations and seed the demo data:**
+   The `assets` service builds the frontend and the entrypoint generates the app key,
+   so no Node install or `key:generate` on the host is required.
+
+4. **Run migrations and seed the demo data:**
    ```bash
    docker-compose exec app php artisan migrate:fresh --seed --force
    ```
 
-4. **Access the application:**
+5. **Access the application:**
    - Web App: http://localhost:18081
    - Admin Panel: http://localhost:18081/admin
    - Database: localhost:5433
