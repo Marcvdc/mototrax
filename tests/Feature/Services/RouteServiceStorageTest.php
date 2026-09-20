@@ -33,11 +33,12 @@ class RouteServiceStorageTest extends TestCase
 
         try {
             app(RouteService::class)->createFromUpload($user, $upload, ['name' => 'Mislukte upload']);
-            $this->fail('Verwachtte een RuntimeException bij een gefaalde opslag.');
+            $thrown = false;
         } catch (RuntimeException) {
-            // verwacht
+            $thrown = true;
         }
 
+        $this->assertTrue($thrown, 'Verwachtte een RuntimeException bij een gefaalde opslag.');
         $this->assertSame(0, Route::query()->count());
     }
 }
