@@ -10,6 +10,7 @@ use App\Services\Gpx\LineSimplifier;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use RuntimeException;
 
 class RouteService
 {
@@ -39,6 +40,10 @@ class RouteService
 
         return DB::transaction(function () use ($user, $gpxFile, $attributes, $parsed): Route {
             $storedPath = Storage::disk(self::DISK)->putFile(self::DIRECTORY, $gpxFile);
+
+            if ($storedPath === false) {
+                throw new RuntimeException('Failed to store the uploaded GPX file.');
+            }
 
             return Route::query()->create([
                 'user_id' => $user->id,
