@@ -1,8 +1,20 @@
-version: '3.8'
-
 services:
+  assets:
+    image: node:22-alpine
+    container_name: mototrax_assets
+    user: "${UID:-1000}:${GID:-1000}"
+    working_dir: /app
+    environment:
+      # npm heeft een schrijfbare HOME nodig; de bind mount is van de host-user,
+      # dus de cache mag niet in een root-owned /root belanden.
+      HOME: /tmp
+      npm_config_cache: /tmp/.npm
+    volumes:
+      - ./:/app
+    command: sh -c "npm ci --no-audit --no-fund && npm run build"
+
   app:
-    user: "${UID}:${GID}"
+    user: "${UID:-1000}:${GID:-1000}"
     build:
       context: .
       dockerfile: Dockerfile
@@ -12,14 +24,27 @@ services:
     volumes:
       - ./:/var/www/html
       - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
-      - storagedata:/var/www/html/storage/app/private
     env_file:
       - .env
+    environment:
+      # Deze stack draait altijd tegen de meegeleverde postgres-service. Die
+      # waarden staan hier en niet in .env.example, zodat de demo zonder
+      # handmatige env-stap werkt en .env.example bruikbaar blijft voor een
+      # lokale sqlite-opzet. `environment` wint van `env_file`, dus een
+      # afwijkende DB_CONNECTION in .env breekt de stack niet meer.
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: mototrax
+      DB_USERNAME: mototrax_user
+      DB_PASSWORD: mototrax_password
     networks:
       - mototrax_network
     depends_on:
       db:
         condition: service_healthy
+      assets:
+        condition: service_completed_successfully
 
   db:
     image: postgres:15
@@ -51,7 +76,10 @@ services:
     networks:
       - mototrax_network
     depends_on:
-      - app
+      app:
+        condition: service_started
+      assets:
+        condition: service_completed_successfully
 
 networks:
   mototrax_network:
@@ -59,6 +87,4 @@ networks:
 
 volumes:
   dbdata:
-    driver: local
-  storagedata:
     driver: local

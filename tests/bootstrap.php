@@ -16,6 +16,11 @@
  */
 $testEnvironment = [
     'APP_ENV' => 'testing',
+    // Vaste, afgeleide testsleutel. Geen geheim: hij staat los van elke echte
+    // omgeving en zorgt dat de suite niet afhangt van een gevulde .env. Zonder
+    // deze regel lekt een lege APP_KEY uit docker-compose binnen en falen alle
+    // tests die de encrypter raken op MissingAppKeyException.
+    'APP_KEY' => 'base64:'.base64_encode(hash('sha256', 'mototrax-testing', true)),
     'APP_MAINTENANCE_DRIVER' => 'file',
     'BCRYPT_ROUNDS' => '4',
     'BROADCAST_CONNECTION' => 'null',

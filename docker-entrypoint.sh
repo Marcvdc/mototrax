@@ -7,6 +7,17 @@ if [ ! -d /var/www/html/vendor ]; then
     composer install --no-interaction --optimize-autoloader
 fi
 
+# Generate an application key when none is provided. docker-compose loads .env
+# with `env_file`, so an empty APP_KEY arrives as a real environment variable,
+# and that wins over the .env file for this process. Exporting the freshly
+# generated key is therefore required, writing it to .env alone is not enough.
+if [ -z "$APP_KEY" ]; then
+    echo "No APP_KEY set, generating one..."
+    php artisan key:generate --force
+    APP_KEY=$(grep '^APP_KEY=' /var/www/html/.env | cut -d '=' -f 2-)
+    export APP_KEY
+fi
+
 # Wait for the database to be ready
 echo "Waiting for database..."
 until pg_isready -h "$DB_HOST" -U "$DB_USERNAME" > /dev/null 2>&1; do
