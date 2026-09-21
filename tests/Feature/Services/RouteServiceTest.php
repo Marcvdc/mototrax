@@ -5,6 +5,8 @@ namespace Tests\Feature\Services;
 use App\Models\User;
 use App\Services\Gpx\GpxParser;
 use App\Services\Gpx\LineSimplifier;
+use App\Services\Gpx\WaypointReducer;
+use App\Services\Maps\GoogleMapsLinkBuilder;
 use App\Services\RouteService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -21,7 +23,13 @@ class RouteServiceTest extends TestCase
     {
         parent::setUp();
         Storage::fake(RouteService::DISK);
-        $this->service = new RouteService(new GpxParser, new LineSimplifier);
+        $simplifier = new LineSimplifier;
+        $this->service = new RouteService(
+            new GpxParser,
+            $simplifier,
+            new WaypointReducer($simplifier),
+            new GoogleMapsLinkBuilder,
+        );
     }
 
     public function test_create_from_upload_persists_route_with_parsed_metadata(): void
@@ -45,6 +53,33 @@ class RouteServiceTest extends TestCase
         $this->assertSame(3, $route->waypoint_count);
         $this->assertSame(51.4416, (float) $route->start_lat);
         Storage::disk(RouteService::DISK)->assertExists($route->gpx_file);
+    }
+
+    public function test_create_from_upload_stores_map_waypoints_for_the_deeplink(): void
+    {
+        $route = $this->service->createFromUpload(
+            User::factory()->create(),
+            $this->fixtureUpload('sample-track.gpx'),
+            ['name' => 'Met pins', 'is_public' => true],
+        );
+
+        $this->assertIsArray($route->map_waypoints);
+        $this->assertLessThanOrEqual(RouteService::MAP_WAYPOINTS, count($route->map_waypoints));
+    }
+
+    public function test_google_maps_url_is_null_without_coordinates(): void
+    {
+        $route = $this->service->createFromUpload(
+            User::factory()->create(),
+            $this->fixtureUpload('sample-track.gpx'),
+            ['name' => 'Zonder coordinaten', 'is_public' => true],
+        );
+
+        $this->assertNotNull($this->service->googleMapsUrl($route));
+
+        $route->forceFill(['start_lat' => null, 'end_lat' => null])->save();
+
+        $this->assertNull($this->service->googleMapsUrl($route->refresh()));
     }
 
     public function test_falls_back_to_average_speed_when_gpx_has_no_timestamps(): void

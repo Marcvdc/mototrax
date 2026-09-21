@@ -30,6 +30,7 @@ class Route extends Model
         'end_lat',
         'end_lng',
         'waypoint_count',
+        'map_waypoints',
     ];
 
     protected function casts(): array
@@ -45,6 +46,7 @@ class Route extends Model
             'end_lat' => 'decimal:7',
             'end_lng' => 'decimal:7',
             'waypoint_count' => 'integer',
+            'map_waypoints' => 'array',
         ];
     }
 

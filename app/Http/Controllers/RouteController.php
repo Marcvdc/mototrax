@@ -25,6 +25,7 @@ class RouteController extends Controller
         return view('routes.show', [
             'route' => $route->loadMissing('user'),
             'geojson' => $geojson,
+            'googleMapsUrl' => $this->routeService->googleMapsUrl($route),
         ]);
     }
 }

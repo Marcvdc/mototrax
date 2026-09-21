@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Models\Route;
+use App\Services\RouteService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -38,6 +39,7 @@ class RouteResource extends JsonResource
                 'lng' => (float) $this->end_lng,
             ]),
             'gpx_url' => route('api.v1.routes.gpx', ['route' => $this->id]),
+            'google_maps_url' => app(RouteService::class)->googleMapsUrl($this->resource),
             'preview_url' => route('api.v1.routes.show', ['route' => $this->id]),
             'user' => [
                 'id' => $this->user->id,
