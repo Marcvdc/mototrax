@@ -81,6 +81,27 @@ class RouteShowTest extends TestCase
         $response->assertSee('&lt;script&gt;alert(1)&lt;/script&gt;', escape: false);
     }
 
+    public function test_page_shows_a_google_maps_deeplink_for_the_route(): void
+    {
+        $route = $this->createRouteWithGpx(isPublic: true);
+
+        $response = $this->get("/routes/{$route->id}")->assertOk();
+
+        $response->assertSee('Open in Google Maps');
+        $response->assertSee('https://www.google.com/maps/dir/?api=1', escape: false);
+        $response->assertSee('rel="noopener noreferrer"', escape: false);
+    }
+
+    public function test_deeplink_is_omitted_when_the_route_has_no_coordinates(): void
+    {
+        $route = $this->createRouteWithGpx(isPublic: true);
+        $route->forceFill(['start_lat' => null, 'end_lat' => null])->save();
+
+        $response = $this->get("/routes/{$route->id}")->assertOk();
+
+        $response->assertDontSee('Open in Google Maps');
+    }
+
     /**
      * @param  array<string, mixed>  $attributes
      */

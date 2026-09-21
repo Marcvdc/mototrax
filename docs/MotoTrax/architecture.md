@@ -103,6 +103,38 @@ Upload (.gpx)
 - Directory: `gpx/`.
 - Toegang loopt **altijd** via `RouteController@download` zodat de policy gerespecteerd wordt.
 
+## Google Maps deeplink (#20)
+
+```
+Upload (.gpx)
+  GpxParser::parseFile -> GpxParseResult
+        |
+        v
+  RouteService::mapWaypointsFor
+        └─ WaypointReducer::reduce(points, max: 9)
+              └─ LineSimplifier in een lus, tolerantie verdubbelt
+                 tot er hoogstens 9 tussenpunten over zijn
+        |
+        v
+  routes.map_waypoints (json)
+
+Weergave
+  RouteService::googleMapsUrl(route)      (leest geen bestand, alleen kolommen)
+        └─ GoogleMapsLinkBuilder::build(start, end, waypoints, max)
+              |
+              ├─ RouteResource            -> google_maps_url (null zonder coordinaten)
+              └─ resources/views/routes/show.blade.php -> knop onder de kaart
+```
+
+De pins worden bij de upload berekend en opgeslagen, niet per request afgeleid: `RouteResource`
+bedient ook de lijst-endpoint, en die mag geen GPX-bestand per route openen. Het GPX-bestand
+verandert nooit meer na de upload, dus de opgeslagen pins kunnen niet verouderen.
+
+Bestaande routes krijgen hun pins via `php artisan routes:backfill-waypoints` (idempotent,
+`--force` herberekent ook gevulde routes).
+
+Keuze en beperkingen: zie [ADR 0005](adr/0005-google-maps-deeplink-boven-kml-export.md).
+
 ## Map Preview (MVP-004b)
 
 ### Datastroom
