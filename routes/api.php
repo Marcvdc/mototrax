@@ -5,7 +5,6 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\RouteController;
 use App\Http\Controllers\Api\UserController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->name('api.v1.')->middleware('throttle:api')->group(function () {
@@ -19,9 +18,7 @@ Route::prefix('v1')->name('api.v1.')->middleware('throttle:api')->group(function
 
     // Authenticated read endpoints
     Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/user', function (Request $request) {
-            return $request->user();
-        })->name('user');
+        Route::get('/user', [UserController::class, 'me'])->name('user');
 
         Route::get('/feed', [PostController::class, 'index'])->name('feed.index');
         Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
