@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\MotorType;
+use App\Services\ProfileService;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
@@ -100,6 +101,15 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
             return null;
         }
 
-        return Storage::disk('public')->url($this->avatar);
+        return Storage::disk(ProfileService::DISK)->url($this->avatar);
+    }
+
+    public function getInitialsAttribute(): string
+    {
+        return collect(explode(' ', (string) $this->name))
+            ->filter()
+            ->take(2)
+            ->map(fn (string $part): string => mb_strtoupper(mb_substr($part, 0, 1)))
+            ->implode('');
     }
 }

@@ -109,4 +109,22 @@ class EditProfileTest extends TestCase
         $this->assertNull($user->refresh()->avatar);
         $disk->assertExists('avatars/someone-else.jpg');
     }
+
+    public function test_panel_avatar_without_upload_uses_local_initials(): void
+    {
+        $user = User::factory()->create(['name' => 'Emma Visser']);
+
+        $avatarUrl = Filament::getUserAvatarUrl($user);
+
+        $this->assertStringStartsWith('data:image/svg+xml;base64,', $avatarUrl);
+        $this->assertStringNotContainsString('ui-avatars.com', $avatarUrl);
+        $this->assertStringContainsString('>EV</text>', base64_decode(substr($avatarUrl, strlen('data:image/svg+xml;base64,'))));
+    }
+
+    public function test_panel_avatar_with_upload_uses_the_stored_file(): void
+    {
+        $user = User::factory()->create(['avatar' => 'avatars/me.png']);
+
+        $this->assertStringEndsWith(Storage::disk(ProfileService::DISK)->url('avatars/me.png'), Filament::getUserAvatarUrl($user));
+    }
 }

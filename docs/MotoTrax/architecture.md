@@ -29,7 +29,7 @@ ProfileService::update
 ```
 
 - `User::avatar_url` geeft de publieke URL of `null`; zonder avatar toont de web-UI initialen (`<x-user-avatar>`), zonder externe dienst.
-- Filament toont de avatar via `HasAvatar::getFilamentAvatarUrl()`; zonder avatar valt Filament terug op zijn standaard-provider.
+- Filament toont de avatar via `HasAvatar::getFilamentAvatarUrl()`; zonder avatar tekent `App\Filament\AvatarProviders\InitialsAvatarProvider` de initialen lokaal als SVG-data-URI (geen ui-avatars.com).
 
 ## Feed & Social flow (MVP-005)
 

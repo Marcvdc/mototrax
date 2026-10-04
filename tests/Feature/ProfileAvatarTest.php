@@ -94,6 +94,19 @@ class ProfileAvatarTest extends TestCase
         $this->assertNull($user->refresh()->avatar);
     }
 
+    public function test_a_string_path_as_avatar_is_rejected_and_the_target_file_is_kept(): void
+    {
+        Storage::disk(ProfileService::DISK)->put('avatars/someone-else.png', 'victim');
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->patch('/profile', $this->profilePayload($user, ['avatar' => 'avatars/someone-else.png']))
+            ->assertSessionHasErrors('avatar');
+
+        $this->assertNull($user->refresh()->avatar);
+        Storage::disk(ProfileService::DISK)->assertExists('avatars/someone-else.png');
+    }
+
     public function test_avatar_larger_than_two_megabytes_is_rejected(): void
     {
         $user = User::factory()->create();
