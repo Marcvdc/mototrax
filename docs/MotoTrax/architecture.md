@@ -12,6 +12,25 @@ Korte referentie voor de hybride architectuur (Type C): Filament admin + Sanctum
 - **API Controllers** (`app/Http/Controllers/Api/`) — delegeren naar services + resources.
 - **Filament Resources** (`app/Filament/Resources/`) — admin UI; deelt services met de API om logica niet te dupliceren.
 
+## User-profiel flow (MVP-008)
+
+```
+PATCH /profile  (web, Breeze)
+  ProfileUpdateRequest (name, email, location?, motor_type? [enum MotorType], avatar? [image ≤2 MB], remove_avatar?)
+    └─ ProfileController@update → ProfileService::update(User, $request->profileAttributes())
+
+/admin/profile  (Filament, App\Filament\Auth\EditProfile)
+  FileUpload slaat zelf op in avatars/ → EditProfile::handleRecordUpdate → ProfileService::update(User, $data)
+
+ProfileService::update
+  ├─ avatar = UploadedFile → store('avatars', 'public'); pad → overnemen; null → weghalen; ontbreekt → ongewijzigd
+  ├─ e-mail gewijzigd → email_verified_at = null
+  └─ oude avatar-bestand verwijderd zodra de avatar wijzigt
+```
+
+- `User::avatar_url` geeft de publieke URL of `null`; zonder avatar toont de web-UI initialen (`<x-user-avatar>`), zonder externe dienst.
+- Filament toont de avatar via `HasAvatar::getFilamentAvatarUrl()`; zonder avatar valt Filament terug op zijn standaard-provider.
+
 ## Feed & Social flow (MVP-005)
 
 ```
@@ -202,7 +221,7 @@ De REST API is geversioneerd onder `/api/v1` (route-namen `api.v1.*`; zie [ADR 0
 | GET | `/notifications` | Sanctum | api |
 | POST | `/notifications/{id}/read`, `/notifications/read-all` | Sanctum | api-write |
 
-¹ `GET /users` lekt **geen** e-mailadressen: `email` verschijnt uitsluitend in het record van de ingelogde gebruiker zelf (`UserResource`).
+¹ `GET /users` lekt **geen** e-mailadressen of locaties: `email` en `location` verschijnen uitsluitend in het record van de ingelogde gebruiker zelf (`UserResource`). `motor_type` (`{value, label}` of `null`) en `avatar_url` zijn publiek. `GET /user` geeft hetzelfde `UserResource` terug (geen `is_admin` of ruw avatar-pad).
 
 ### Postman
 - Collectie: `docs/MotoTrax/api/mototrax.postman_collection.json` (zet `base_url` + `token`).

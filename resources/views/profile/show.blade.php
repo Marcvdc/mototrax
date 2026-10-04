@@ -1,9 +1,19 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ $user->name }}
-            </h2>
+            <div class="flex items-center gap-4">
+                <x-user-avatar :user="$user" size="h-12 w-12 text-base" />
+                <div>
+                    <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                        {{ $user->name }}
+                    </h2>
+                    @if ($user->location || $user->motor_type)
+                        <p class="text-sm text-gray-500">
+                            {{ collect([$user->location, $user->motor_type?->getLabel()])->filter()->implode(' · ') }}
+                        </p>
+                    @endif
+                </div>
+            </div>
             <a href="{{ route('profile.edit') }}" class="text-sm text-indigo-600 hover:text-indigo-800">
                 Profiel bewerken
             </a>
