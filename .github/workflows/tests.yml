@@ -41,3 +41,25 @@ jobs:
 
       - name: Check code style (Pint)
         run: ./vendor/bin/pint --test
+
+  build:
+    # Zonder deze job toetst de CI de frontend nooit, en kan een npm-update die de build
+    # breekt groen door de checks (tailwindcss 4 in #30). Node 22, net als de assets-service.
+    name: Frontend build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Build
+        run: npm run build
