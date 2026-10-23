@@ -127,8 +127,9 @@ Weergave
 ```
 
 De pins worden bij de upload berekend en opgeslagen, niet per request afgeleid: `RouteResource`
-bedient ook de lijst-endpoint, en die mag geen GPX-bestand per route openen. Het GPX-bestand
-verandert nooit meer na de upload, dus de opgeslagen pins kunnen niet verouderen.
+bedient ook de lijst-endpoint, en die mag geen GPX-bestand per route openen. Via de API
+verandert het GPX-bestand na de upload niet. Vervangt een beheerder het in Filament, dan vult
+`EditRoute` via `FillsGpxMetadata` de pins opnieuw, dus de opgeslagen pins verouderen niet.
 
 Bestaande routes krijgen hun pins via `php artisan routes:backfill-waypoints` (idempotent,
 `--force` herberekent ook gevulde routes).

@@ -1,4 +1,4 @@
-# ADR 0005 — Google Maps: deeplink met pins boven KML-export
+# ADR 0005: Google Maps, deeplink met pins boven KML-export
 
 - **Status:** Accepted
 - **Datum:** 2026-09-20
@@ -32,9 +32,11 @@ zelf geen IO.
    - **Con:** de gebruiker moet zelf plakken en pinnen, wat precies het handwerk is dat de wens
      wilde wegnemen.
 4. **Pins per request uit het GPX-bestand afleiden**
-   - **Con:** `RouteResource` bedient ook de gepagineerde lijst-endpoint. Dat zou 25 keer
-     `parseFile()` per request betekenen. Het GPX-bestand verandert nooit meer na de upload
-     (`UpdateRouteRequest` accepteert alleen metadata), dus opslaan is zowel goedkoper als correct.
+   - **Con:** `RouteResource` bedient ook de lijst-endpoint, en die geeft alle routes in een keer
+     terug (niet gepagineerd). Dat zou per request een `parseFile()` per route betekenen. Via de
+     API verandert het GPX-bestand na de upload niet (`UpdateRouteRequest` accepteert alleen
+     metadata). In Filament kan het wel worden vervangen, maar `EditRoute` vult dan via
+     `FillsGpxMetadata` ook de pins opnieuw. Opslaan is dus zowel goedkoper als correct.
 
 ## Gevolgen
 
