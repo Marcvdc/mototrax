@@ -63,8 +63,8 @@ class RouteServiceTest extends TestCase
             ['name' => 'Met pins', 'is_public' => true],
         );
 
-        $this->assertIsArray($route->map_waypoints);
-        $this->assertLessThanOrEqual(RouteService::MAP_WAYPOINTS, count($route->map_waypoints));
+        // De fixture heeft drie punten: start, een knik en eind. De knik is de enige pin.
+        $this->assertSame([['lat' => 51.45, 'lng' => 5.48]], $route->map_waypoints);
     }
 
     public function test_google_maps_url_is_null_without_coordinates(): void
@@ -75,7 +75,7 @@ class RouteServiceTest extends TestCase
             ['name' => 'Zonder coordinaten', 'is_public' => true],
         );
 
-        $this->assertNotNull($this->service->googleMapsUrl($route));
+        $this->assertStringContainsString('waypoints=51.45%2C5.48', $this->service->googleMapsUrl($route));
 
         $route->forceFill(['start_lat' => null, 'end_lat' => null])->save();
 

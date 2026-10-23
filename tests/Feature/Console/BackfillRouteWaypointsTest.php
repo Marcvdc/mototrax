@@ -27,8 +27,7 @@ class BackfillRouteWaypointsTest extends TestCase
 
         $this->artisan('routes:backfill-waypoints')->assertSuccessful();
 
-        $route->refresh();
-        $this->assertIsArray($route->map_waypoints);
+        $this->assertSame([['lat' => 51.45, 'lng' => 5.48]], $route->refresh()->map_waypoints);
     }
 
     public function test_it_skips_routes_that_already_have_waypoints(): void
@@ -50,7 +49,7 @@ class BackfillRouteWaypointsTest extends TestCase
 
         $this->artisan('routes:backfill-waypoints', ['--force' => true])->assertSuccessful();
 
-        $this->assertNotSame([['lat' => 0.0, 'lng' => 0.0]], $route->refresh()->map_waypoints);
+        $this->assertSame([['lat' => 51.45, 'lng' => 5.48]], $route->refresh()->map_waypoints);
     }
 
     public function test_it_skips_a_route_whose_gpx_file_is_missing_without_failing(): void

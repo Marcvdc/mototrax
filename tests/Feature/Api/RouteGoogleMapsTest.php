@@ -33,6 +33,7 @@ class RouteGoogleMapsTest extends TestCase
         $this->assertStringContainsString('origin=', $url);
         $this->assertStringContainsString('destination=', $url);
         $this->assertStringContainsString('travelmode=driving', $url);
+        $this->assertStringContainsString('waypoints=51.45%2C5.48', $url);
     }
 
     public function test_deeplink_is_null_when_the_route_has_no_coordinates(): void

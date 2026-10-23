@@ -71,6 +71,25 @@ class WaypointReducerTest extends TestCase
         $this->assertLessThanOrEqual(9, count($reduced));
     }
 
+    public function test_falls_back_to_even_sampling_when_the_track_does_not_simplify(): void
+    {
+        // Met echte sporen klapt de tolerantie lang voor MAX_ITERATIONS alles in.
+        // Een simplifier die niets weghaalt is de enige manier om het vangnet te raken.
+        $reducer = new WaypointReducer(new class extends LineSimplifier
+        {
+            public function simplify(array $points, float $tolerance): array
+            {
+                return $points;
+            }
+        });
+        $points = array_map(fn (int $i): array => ['lat' => (float) $i, 'lng' => 0.0], range(0, 11));
+
+        $reduced = $reducer->reduce($points, 3);
+
+        // Tien tussenpunten (1 t/m 10) worden er drie, gelijk verdeeld: kop en staart blijven.
+        $this->assertSame([1.0, 6.0, 10.0], array_column($reduced, 'lat'));
+    }
+
     /**
      * @return list<array{lat: float, lng: float}>
      */

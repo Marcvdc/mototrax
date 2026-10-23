@@ -89,6 +89,7 @@ class RouteShowTest extends TestCase
 
         $response->assertSee('Open in Google Maps');
         $response->assertSee('https://www.google.com/maps/dir/?api=1', escape: false);
+        $response->assertSee('waypoints=51.45%2C5.48', escape: false);
         $response->assertSee('rel="noopener noreferrer"', escape: false);
     }
 
