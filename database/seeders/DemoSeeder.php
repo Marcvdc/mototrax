@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\MotorType;
 use App\Models\Bike;
 use App\Models\MaintenanceLog;
 use App\Models\Post;
@@ -49,10 +50,10 @@ class DemoSeeder extends Seeder
         $admin = User::query()->where('email', 'admin@mototrax.dev')->firstOrFail();
 
         $demoUsers = [
-            ['name' => 'Jan de Vries', 'email' => 'jan@mototrax.dev'],
-            ['name' => 'Sanne Bakker', 'email' => 'sanne@mototrax.dev'],
-            ['name' => 'Youssef El Amrani', 'email' => 'youssef@mototrax.dev'],
-            ['name' => 'Emma Visser', 'email' => 'emma@mototrax.dev'],
+            ['name' => 'Jan de Vries', 'email' => 'jan@mototrax.dev', 'location' => 'Utrecht', 'motor_type' => MotorType::Toer],
+            ['name' => 'Sanne Bakker', 'email' => 'sanne@mototrax.dev', 'location' => 'Groningen', 'motor_type' => MotorType::Naked],
+            ['name' => 'Youssef El Amrani', 'email' => 'youssef@mototrax.dev', 'location' => 'Rotterdam', 'motor_type' => MotorType::Sport],
+            ['name' => 'Emma Visser', 'email' => 'emma@mototrax.dev', 'location' => 'Arnhem', 'motor_type' => MotorType::Adventure],
         ];
 
         $users = [$admin];

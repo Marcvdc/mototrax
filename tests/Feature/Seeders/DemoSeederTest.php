@@ -34,6 +34,7 @@ class DemoSeederTest extends TestCase
             'email' => 'admin@mototrax.dev',
             'is_admin' => true,
         ]);
+        $this->assertSame(4, User::query()->whereNotNull('motor_type')->whereNotNull('location')->count());
     }
 
     public function test_every_seeded_route_has_a_real_gpx_file_on_disk(): void
