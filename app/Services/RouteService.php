@@ -5,8 +5,11 @@ namespace App\Services;
 use App\Models\Route;
 use App\Models\User;
 use App\Services\Gpx\GpxParser;
+use App\Services\Gpx\GpxParseResult;
 use App\Services\Gpx\InvalidGpxException;
 use App\Services\Gpx\LineSimplifier;
+use App\Services\Gpx\WaypointReducer;
+use App\Services\Maps\GoogleMapsLinkBuilder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -24,9 +27,17 @@ class RouteService
 
     public const SIMPLIFY_TOLERANCE = 0.0001;
 
+    /**
+     * Aantal pins dat bij de upload wordt vastgelegd voor de Google
+     * Maps-deeplink. Gelijk aan de limiet van Google's URL-API.
+     */
+    public const MAP_WAYPOINTS = GoogleMapsLinkBuilder::MAX_WAYPOINTS;
+
     public function __construct(
         private readonly GpxParser $parser,
         private readonly LineSimplifier $simplifier,
+        private readonly WaypointReducer $waypointReducer,
+        private readonly GoogleMapsLinkBuilder $linkBuilder,
     ) {}
 
     /**
@@ -61,6 +72,7 @@ class RouteService
                 'end_lat' => $parsed->end['lat'],
                 'end_lng' => $parsed->end['lng'],
                 'waypoint_count' => $parsed->waypointCount,
+                'map_waypoints' => $this->mapWaypointsFor($parsed),
             ]);
         });
     }
@@ -101,6 +113,37 @@ class RouteService
                 'simplified' => count($points) < count($parsed->points),
             ],
         ];
+    }
+
+    /**
+     * Deeplink naar Google Maps, opgebouwd uit de opgeslagen metadata. Leest
+     * het GPX-bestand bewust niet, zodat de lijst-endpoint geen bestand per
+     * route hoeft te openen.
+     */
+    public function googleMapsUrl(Route $route): ?string
+    {
+        if ($route->start_lat === null || $route->end_lat === null) {
+            return null;
+        }
+
+        return $this->linkBuilder->build(
+            ['lat' => (float) $route->start_lat, 'lng' => (float) $route->start_lng],
+            ['lat' => (float) $route->end_lat, 'lng' => (float) $route->end_lng],
+            $route->map_waypoints ?? [],
+        );
+    }
+
+    /**
+     * @return list<array{lat: float, lng: float}>
+     */
+    public function mapWaypointsFor(GpxParseResult $parsed): array
+    {
+        $points = array_map(
+            fn (array $p): array => ['lat' => $p['lat'], 'lng' => $p['lng']],
+            $parsed->points,
+        );
+
+        return $this->waypointReducer->reduce($points, self::MAP_WAYPOINTS);
     }
 
     private function fallbackDurationMinutes(float $distanceKm): int

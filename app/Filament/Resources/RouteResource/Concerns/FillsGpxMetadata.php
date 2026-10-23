@@ -45,6 +45,7 @@ trait FillsGpxMetadata
         $data['end_lat'] = $parsed->end['lat'];
         $data['end_lng'] = $parsed->end['lng'];
         $data['waypoint_count'] = $parsed->waypointCount;
+        $data['map_waypoints'] = app(RouteService::class)->mapWaypointsFor($parsed);
 
         if (empty($data['name']) && $parsed->name !== null) {
             $data['name'] = $parsed->name;
