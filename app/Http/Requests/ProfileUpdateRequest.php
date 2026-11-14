@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\MotorType;
 use App\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -26,6 +27,29 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+            'location' => ['nullable', 'string', 'max:100'],
+            'motor_type' => ['nullable', Rule::enum(MotorType::class)],
+            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'remove_avatar' => ['nullable', 'boolean'],
         ];
+    }
+
+    /**
+     * De profielvelden voor ProfileService: `avatar` alleen bij een upload (vervangen) of bij
+     * `remove_avatar` (weghalen), zodat een leeg bestandsveld de huidige avatar laat staan.
+     *
+     * @return array<string, mixed>
+     */
+    public function profileAttributes(): array
+    {
+        $attributes = $this->safe()->except(['avatar', 'remove_avatar']);
+
+        if ($this->hasFile('avatar')) {
+            $attributes['avatar'] = $this->file('avatar');
+        } elseif ($this->boolean('remove_avatar')) {
+            $attributes['avatar'] = null;
+        }
+
+        return $attributes;
     }
 }

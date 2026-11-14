@@ -13,7 +13,7 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6" enctype="multipart/form-data">
         @csrf
         @method('patch')
 
@@ -45,6 +45,38 @@
                     @endif
                 </div>
             @endif
+        </div>
+
+        <div>
+            <x-input-label for="location" value="Locatie" />
+            <x-text-input id="location" name="location" type="text" class="mt-1 block w-full" :value="old('location', $user->location)" maxlength="100" autocomplete="address-level2" />
+            <x-input-error class="mt-2" :messages="$errors->get('location')" />
+        </div>
+
+        <div>
+            <x-input-label for="motor_type" value="Motor-type" />
+            <select id="motor_type" name="motor_type" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                <option value="">Geen voorkeur</option>
+                @foreach (\App\Enums\MotorType::cases() as $motorType)
+                    <option value="{{ $motorType->value }}" @selected(old('motor_type', $user->motor_type?->value) === $motorType->value)>{{ $motorType->getLabel() }}</option>
+                @endforeach
+            </select>
+            <x-input-error class="mt-2" :messages="$errors->get('motor_type')" />
+        </div>
+
+        <div>
+            <x-input-label for="avatar" value="Avatar" />
+            <div class="mt-1 flex items-center gap-4">
+                <x-user-avatar :user="$user" size="h-16 w-16 text-lg" />
+                <input id="avatar" name="avatar" type="file" accept="image/jpeg,image/png,image/webp" class="block w-full text-sm text-gray-600" />
+            </div>
+            @if ($user->avatar)
+                <label for="remove_avatar" class="mt-2 inline-flex items-center gap-2 text-sm text-gray-600">
+                    <input id="remove_avatar" name="remove_avatar" type="checkbox" value="1" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" />
+                    Avatar verwijderen
+                </label>
+            @endif
+            <x-input-error class="mt-2" :messages="$errors->get('avatar')" />
         </div>
 
         <div class="flex items-center gap-4">
