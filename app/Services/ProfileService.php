@@ -56,15 +56,13 @@ class ProfileService
 
     /**
      * Verwijdert het account en daarna het avatarbestand, zodat de foto niet publiek bereikbaar
-     * blijft via de oude URL. Het bestand gaat pas weg als het record verwijderd is.
+     * blijft via de oude URL. Het bestand gaat alleen weg als het record echt verwijderd is.
      */
     public function delete(User $user): void
     {
         $avatar = $user->avatar;
 
-        $user->delete();
-
-        if ($avatar !== null) {
+        if ($user->delete() && $avatar !== null) {
             Storage::disk(self::DISK)->delete($avatar);
         }
     }

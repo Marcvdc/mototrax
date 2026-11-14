@@ -128,4 +128,33 @@ class ProfileServiceTest extends TestCase
 
         $this->assertNull($user->fresh());
     }
+
+    public function test_an_already_stored_path_is_kept_when_saving_the_user_fails(): void
+    {
+        $disk = Storage::disk(ProfileService::DISK);
+        $disk->put('avatars/from-filament.jpg', 'new');
+        $user = User::factory()->create(['avatar' => null]);
+        User::saving(fn (): never => throw new RuntimeException('Opslaan mislukt'));
+
+        try {
+            $this->profileService->update($user, ['avatar' => 'avatars/from-filament.jpg']);
+            $this->fail('Er had een RuntimeException moeten komen.');
+        } catch (RuntimeException) {
+        }
+
+        $disk->assertExists('avatars/from-filament.jpg');
+    }
+
+    public function test_delete_keeps_the_avatar_file_when_deleting_is_cancelled(): void
+    {
+        $disk = Storage::disk(ProfileService::DISK);
+        $disk->put('avatars/current.jpg', 'current');
+        $user = User::factory()->create(['avatar' => 'avatars/current.jpg']);
+        User::deleting(fn (): bool => false);
+
+        $this->profileService->delete($user);
+
+        $this->assertNotNull($user->fresh());
+        $disk->assertExists('avatars/current.jpg');
+    }
 }
