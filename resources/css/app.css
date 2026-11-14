@@ -1,6 +1,35 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@plugin '@tailwindcss/forms';
+
+/*
+  resources/views en resources/js vindt Tailwind 4 zelf. Deze paden staan in .gitignore
+  en worden daarom niet automatisch gescand.
+*/
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    --font-sans:
+        Figtree, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+        'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/*
+  Tailwind 4 maakt randen standaard `currentcolor`; Tailwind 3 gebruikte gray-200.
+  Dit blok houdt de oude standaard aan, zodat elementen met alleen `border` er
+  hetzelfde uit blijven zien. Weghalen kan pas als elk zo'n element een eigen
+  border-kleur heeft.
+*/
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentcolor);
+    }
+}
 
 .route-map-container {
     height: 420px;

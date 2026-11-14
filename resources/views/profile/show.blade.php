@@ -16,7 +16,7 @@
             @if (session('new_token'))
                 <div class="bg-green-50 border border-green-400 rounded-lg p-4">
                     <p class="font-semibold text-green-800 mb-1">Token aangemaakt — kopieer hem nu, je ziet hem maar één keer:</p>
-                    <code class="block bg-green-100 text-green-900 px-3 py-2 rounded text-sm break-all">{{ session('new_token') }}</code>
+                    <code class="block bg-green-100 text-green-900 px-3 py-2 rounded-sm text-sm break-all">{{ session('new_token') }}</code>
                 </div>
             @endif
 
@@ -27,14 +27,14 @@
                     ['label' => 'Onderhoudslogs', 'value' => $user->bikes->sum(fn($b) => $b->maintenanceLogs->count())],
                     ['label' => 'API tokens', 'value' => $tokens->count()],
                 ] as $stat)
-                    <div class="bg-white rounded-lg shadow-sm p-4 text-center">
+                    <div class="bg-white rounded-lg shadow-xs p-4 text-center">
                         <div class="text-3xl font-bold text-indigo-600">{{ $stat['value'] }}</div>
                         <div class="text-sm text-gray-500 mt-1">{{ $stat['label'] }}</div>
                     </div>
                 @endforeach
             </div>
 
-            <div class="bg-white rounded-lg shadow-sm">
+            <div class="bg-white rounded-lg shadow-xs">
                 <div class="px-6 py-4 border-b flex items-center justify-between">
                     <h3 class="text-lg font-semibold text-gray-800">Mijn motoren</h3>
                 </div>
@@ -65,7 +65,7 @@
                 @endif
             </div>
 
-            <div class="bg-white rounded-lg shadow-sm">
+            <div class="bg-white rounded-lg shadow-xs">
                 <div class="px-6 py-4 border-b">
                     <h3 class="text-lg font-semibold text-gray-800">Mijn routes</h3>
                 </div>
@@ -92,7 +92,7 @@
                 @endif
             </div>
 
-            <div class="bg-white rounded-lg shadow-sm">
+            <div class="bg-white rounded-lg shadow-xs">
                 <div class="px-6 py-4 border-b">
                     <h3 class="text-lg font-semibold text-gray-800">API Tokens</h3>
                 </div>
@@ -100,7 +100,7 @@
                     <form method="POST" action="{{ route('profile.tokens.create') }}" class="flex gap-3">
                         @csrf
                         <input type="text" name="token_name" placeholder="Token naam (bijv. Postman)" required
-                            class="flex-1 border-gray-300 rounded-md shadow-sm text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                            class="flex-1 border-gray-300 rounded-md shadow-xs text-sm focus:ring-indigo-500 focus:border-indigo-500">
                         <button type="submit" class="bg-indigo-600 text-white text-sm px-4 py-2 rounded-md hover:bg-indigo-700">
                             Aanmaken
                         </button>
