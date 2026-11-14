@@ -1,6 +1,51 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@plugin '@tailwindcss/forms';
+
+/*
+  Tailwind 4 scant zelf de hele repo, behalve wat in .gitignore staat. vendor/ en
+  storage/framework/views staan daarin, dus die paden moeten er hier expliciet bij.
+*/
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    --font-sans:
+        Figtree, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+        'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/*
+  Tailwind 4 maakt randen standaard `currentcolor`; Tailwind 3 gebruikte gray-200.
+  Dit blok houdt de oude standaard aan, zodat elementen met alleen `border` er
+  hetzelfde uit blijven zien. Weghalen kan pas als elk zo'n element een eigen
+  border-kleur heeft.
+*/
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentcolor);
+    }
+
+    /*
+      Tailwind 4 haalt in de preflight rand en achtergrond van de bestandskiezer weg,
+      waardoor "Choose File" er niet meer als knop uitziet. Dit zet de browserstijl
+      terug, met het font van de pagina, zoals in Tailwind 3.
+    */
+    ::file-selector-button {
+        all: revert;
+        font: inherit;
+    }
+
+    /* Tailwind 4 zet knoppen op cursor: default; dit houdt de pointer van Tailwind 3. */
+    button:not(:disabled),
+    [role='button']:not(:disabled) {
+        cursor: pointer;
+    }
+}
 
 .route-map-container {
     height: 420px;

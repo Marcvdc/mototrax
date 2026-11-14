@@ -33,7 +33,7 @@
                     <p class="text-sm mt-2 text-gray-800">
                         {{ __('Your email address is unverified.') }}
 
-                        <button form="send-verification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <button form="send-verification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                             {{ __('Click here to re-send the verification email.') }}
                         </button>
                     </p>
@@ -55,7 +55,7 @@
 
         <div>
             <x-input-label for="motor_type" value="Motor-type" />
-            <select id="motor_type" name="motor_type" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+            <select id="motor_type" name="motor_type" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-xs">
                 <option value="">Geen voorkeur</option>
                 @foreach (\App\Enums\MotorType::cases() as $motorType)
                     <option value="{{ $motorType->value }}" @selected(old('motor_type', $user->motor_type?->value) === $motorType->value)>{{ $motorType->getLabel() }}</option>
@@ -72,7 +72,7 @@
             </div>
             @if ($user->avatar)
                 <label for="remove_avatar" class="mt-2 inline-flex items-center gap-2 text-sm text-gray-600">
-                    <input id="remove_avatar" name="remove_avatar" type="checkbox" value="1" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" />
+                    <input id="remove_avatar" name="remove_avatar" type="checkbox" value="1" class="rounded-sm border-gray-300 text-indigo-600 shadow-xs focus:ring-indigo-500" />
                     Avatar verwijderen
                 </label>
             @endif

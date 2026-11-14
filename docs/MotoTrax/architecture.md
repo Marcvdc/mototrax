@@ -232,6 +232,10 @@ Geconfigureerd via `config/map.php` (env-overrideable — zie ADR 0002):
 - Estimated time: prefereer `<time>`-stempels; bij ontbreken fallback op gemiddelde 60 km/u (`RouteService::DEFAULT_AVERAGE_SPEED_KMH`).
 - XML wordt geladen met `LIBXML_NONET` (geen externe entiteiten / netwerktoegang) ter bescherming tegen XXE.
 
+## Frontend build (#32)
+
+Vite met Tailwind 4 via `@tailwindcss/vite`. Er is geen `tailwind.config.js` of `postcss.config.js`; de configuratie staat in `resources/css/app.css`. Zie [ADR 0006](adr/0006-tailwind-4-via-vite-plugin.md).
+
 ## API Layer (MVP-006)
 
 De REST API is geversioneerd onder `/api/v1` (route-namen `api.v1.*`; zie [ADR 0004](adr/0004-api-versioning-v1.md)). Alle responses lopen via Eloquent API Resources; foutresponses voor `api/*` worden als JSON gerenderd (`shouldRenderJsonWhen` in `bootstrap/app.php`).
