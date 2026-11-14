@@ -3,8 +3,8 @@
 @plugin '@tailwindcss/forms';
 
 /*
-  resources/views en resources/js vindt Tailwind 4 zelf. Deze paden staan in .gitignore
-  en worden daarom niet automatisch gescand.
+  Tailwind 4 scant zelf de hele repo, behalve wat in .gitignore staat. vendor/ en
+  storage/framework/views staan daarin, dus die paden moeten er hier expliciet bij.
 */
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -28,6 +28,12 @@
     ::backdrop,
     ::file-selector-button {
         border-color: var(--color-gray-200, currentcolor);
+    }
+
+    /* Tailwind 4 zet knoppen op cursor: default; dit houdt de pointer van Tailwind 3. */
+    button:not(:disabled),
+    [role='button']:not(:disabled) {
+        cursor: pointer;
     }
 }
 
