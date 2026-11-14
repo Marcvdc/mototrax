@@ -14,8 +14,8 @@ De frontend gebruikt Tailwind 4 via **`@tailwindcss/vite`** in `vite.config.js`.
 - `@source` voor de pagination-views in `vendor/` en voor `storage/framework/views`, omdat de
   automatische detectie alles in `.gitignore` overslaat;
 - `@theme` voor het Figtree-font;
-- een base-blok dat twee standaarden van Tailwind 3 aanhoudt: de border-kleur gray-200 en
-  `cursor: pointer` op knoppen.
+- een base-blok dat drie standaarden van Tailwind 3 aanhoudt: de border-kleur gray-200, de
+  browserstijl van de bestandskiezer (`::file-selector-button`) en `cursor: pointer` op knoppen.
 
 ## Alternatieven overwogen
 
@@ -41,5 +41,5 @@ De frontend gebruikt Tailwind 4 via **`@tailwindcss/vite`** in `vite.config.js`.
 
 ## Openstaande punten
 
-- Het base-blok voor border-kleur en cursor kan weg zodra elk element met `border` een eigen kleur
+- Het base-blok voor border-kleur, bestandskiezer en cursor kan weg zodra elk element met `border` een eigen kleur
   heeft en de pointer niet meer gewenst is. Dat is een eigen keuze, los van deze upgrade.

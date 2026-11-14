@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Api\Users;
 
+use App\Enums\MotorType;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -17,7 +18,7 @@ class UserIndexTest extends TestCase
         $this->getJson('/api/v1/users')
             ->assertOk()
             ->assertJsonStructure([
-                'data' => [['id', 'name', 'bikes_count', 'routes_count', 'maintenance_logs_count', 'total_km', 'created_at']],
+                'data' => [['id', 'name', 'motor_type', 'avatar_url', 'bikes_count', 'routes_count', 'maintenance_logs_count', 'total_km', 'created_at']],
                 'links',
                 'meta',
             ]);
@@ -48,5 +49,36 @@ class UserIndexTest extends TestCase
                 $this->assertArrayNotHasKey('email', $user);
             }
         }
+    }
+
+    public function test_profile_fields_are_public_except_location(): void
+    {
+        $me = User::factory()->create(['location' => 'Leiden']);
+        User::factory()->create([
+            'location' => 'Haarlem',
+            'motor_type' => MotorType::Enduro,
+            'avatar' => 'avatars/rider.jpg',
+        ]);
+
+        $response = $this->actingAs($me)->getJson('/api/v1/users')->assertOk();
+
+        foreach ($response->json('data') as $user) {
+            if ($user['id'] === $me->id) {
+                $this->assertSame('Leiden', $user['location']);
+            } else {
+                $this->assertArrayNotHasKey('location', $user);
+                $this->assertSame(['value' => 'enduro', 'label' => 'Enduro'], $user['motor_type']);
+                $this->assertStringEndsWith('avatars/rider.jpg', $user['avatar_url']);
+            }
+        }
+    }
+
+    public function test_location_is_hidden_from_anonymous_visitors(): void
+    {
+        User::factory()->create(['location' => 'Haarlem']);
+
+        $response = $this->getJson('/api/v1/users')->assertOk();
+
+        $this->assertArrayNotHasKey('location', $response->json('data.0'));
     }
 }

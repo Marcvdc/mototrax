@@ -30,6 +30,16 @@
         border-color: var(--color-gray-200, currentcolor);
     }
 
+    /*
+      Tailwind 4 haalt in de preflight rand en achtergrond van de bestandskiezer weg,
+      waardoor "Choose File" er niet meer als knop uitziet. Dit zet de browserstijl
+      terug, met het font van de pagina, zoals in Tailwind 3.
+    */
+    ::file-selector-button {
+        all: revert;
+        font: inherit;
+    }
+
     /* Tailwind 4 zet knoppen op cursor: default; dit houdt de pointer van Tailwind 3. */
     button:not(:disabled),
     [role='button']:not(:disabled) {
