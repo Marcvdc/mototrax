@@ -36,7 +36,7 @@ class ProfileController extends Controller
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request, ProfileService $profileService): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
@@ -46,7 +46,7 @@ class ProfileController extends Controller
 
         Auth::logout();
 
-        $user->delete();
+        $profileService->delete($user);
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

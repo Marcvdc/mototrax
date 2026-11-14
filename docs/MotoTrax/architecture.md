@@ -25,7 +25,12 @@ PATCH /profile  (web, Breeze)
 ProfileService::update
   ├─ avatar = UploadedFile → store('avatars', 'public'); pad → overnemen; null → weghalen; ontbreekt → ongewijzigd
   ├─ e-mail gewijzigd → email_verified_at = null
-  └─ oude avatar-bestand verwijderd zodra de avatar wijzigt
+  ├─ oude avatar-bestand verwijderd zodra de avatar wijzigt
+  └─ opslaan van de user mislukt → net opgeslagen upload weer verwijderd (geen weesbestand)
+
+DELETE /profile  (web, Breeze)
+  wachtwoordcheck → ProfileController@destroy → ProfileService::delete(User)
+    └─ user-record verwijderd, daarna het avatarbestand op de public disk
 ```
 
 - `User::avatar_url` geeft de publieke URL of `null`; zonder avatar toont de web-UI initialen (`<x-user-avatar>`), zonder externe dienst.
