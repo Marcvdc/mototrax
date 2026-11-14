@@ -45,6 +45,20 @@
         </dl>
 
         <x-route-map :route="$route" :geojson="$geojson" />
+
+        @if ($googleMapsUrl)
+            <div class="mt-6">
+                <a href="{{ $googleMapsUrl }}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="inline-flex items-center gap-2 rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700">
+                    {{ __('Open in Google Maps') }}
+                </a>
+                <p class="mt-2 text-xs text-gray-500">
+                    {{ __('Google berekent zelf een route tussen de pins, dus dit is een benadering van het GPX-spoor.') }}
+                </p>
+            </div>
+        @endif
     </main>
 </body>
 </html>
