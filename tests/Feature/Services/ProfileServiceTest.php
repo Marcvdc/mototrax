@@ -8,6 +8,7 @@ use App\Services\ProfileService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use RuntimeException;
 use Tests\TestCase;
 
 class ProfileServiceTest extends TestCase
@@ -88,5 +89,43 @@ class ProfileServiceTest extends TestCase
         $this->profileService->update($user, ['email' => 'nieuw@example.com']);
 
         $this->assertNull($user->refresh()->email_verified_at);
+    }
+
+    public function test_a_stored_upload_is_removed_when_saving_the_user_fails(): void
+    {
+        $disk = Storage::disk(ProfileService::DISK);
+        $disk->put('avatars/current.jpg', 'current');
+        $user = User::factory()->create(['avatar' => 'avatars/current.jpg']);
+        User::saving(fn (): never => throw new RuntimeException('Opslaan mislukt'));
+
+        try {
+            $this->profileService->update($user, ['avatar' => UploadedFile::fake()->image('avatar.png')]);
+            $this->fail('Er had een RuntimeException moeten komen.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame('Opslaan mislukt', $exception->getMessage());
+        }
+
+        $this->assertSame(['avatars/current.jpg'], $disk->allFiles(ProfileService::DIRECTORY));
+    }
+
+    public function test_delete_removes_the_user_and_the_avatar_file(): void
+    {
+        $disk = Storage::disk(ProfileService::DISK);
+        $disk->put('avatars/current.jpg', 'current');
+        $user = User::factory()->create(['avatar' => 'avatars/current.jpg']);
+
+        $this->profileService->delete($user);
+
+        $this->assertNull($user->fresh());
+        $disk->assertMissing('avatars/current.jpg');
+    }
+
+    public function test_delete_without_avatar_removes_the_user(): void
+    {
+        $user = User::factory()->create(['avatar' => null]);
+
+        $this->profileService->delete($user);
+
+        $this->assertNull($user->fresh());
     }
 }

@@ -4,7 +4,9 @@ namespace Tests\Feature;
 
 use App\Enums\MotorType;
 use App\Models\User;
+use App\Services\ProfileService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ProfileTest extends TestCase
@@ -115,6 +117,38 @@ class ProfileTest extends TestCase
 
         $this->assertGuest();
         $this->assertNull($user->fresh());
+    }
+
+    public function test_deleting_the_account_removes_the_avatar_file(): void
+    {
+        Storage::fake(ProfileService::DISK);
+        Storage::disk(ProfileService::DISK)->put('avatars/current.jpg', 'current');
+        $user = User::factory()->create(['avatar' => 'avatars/current.jpg']);
+
+        $this
+            ->actingAs($user)
+            ->delete('/profile', ['password' => 'password'])
+            ->assertSessionHasNoErrors()
+            ->assertRedirect('/');
+
+        $this->assertNull($user->fresh());
+        Storage::disk(ProfileService::DISK)->assertMissing('avatars/current.jpg');
+    }
+
+    public function test_a_wrong_password_keeps_the_avatar_file(): void
+    {
+        Storage::fake(ProfileService::DISK);
+        Storage::disk(ProfileService::DISK)->put('avatars/current.jpg', 'current');
+        $user = User::factory()->create(['avatar' => 'avatars/current.jpg']);
+
+        $this
+            ->actingAs($user)
+            ->from('/profile')
+            ->delete('/profile', ['password' => 'wrong-password'])
+            ->assertSessionHasErrorsIn('userDeletion', 'password');
+
+        $this->assertNotNull($user->fresh());
+        Storage::disk(ProfileService::DISK)->assertExists('avatars/current.jpg');
     }
 
     public function test_correct_password_must_be_provided_to_delete_account(): void
