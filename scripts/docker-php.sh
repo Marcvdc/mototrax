@@ -56,30 +56,16 @@ docker_args=(
   --env COMPOSER_CACHE_DIR=/tmp/composer-cache
   --volume "$REPO_ROOT/php/local.ini:/usr/local/etc/php/conf.d/local.ini:ro"
   --volume "$COMPOSER_CACHE:/tmp/composer-cache"
+  --workdir /var/www/html
+  --volume "$REPO_ROOT:/var/www/html"
 )
 
-# De sabotagecheck van de onafhankelijke review linkt vendor/ uit een andere worktree.
-# Composer rekent de paden naar app/ uit vanaf de echte plek van vendor/, dus via die link
-# zou de autoloader de code uit de andere worktree laden. Een mount op vendor/ volgt de link
-# ook. Daarom komt in dat geval elk item uit de repo-root los in /work te staan, en het doel
-# van de link als gewone map op /work/vendor.
+# Een gelinkte vendor/ zou de autoloader de code van de andere kant van de link laten laden.
+# hobby-ontwikkeling 0.5.2 en hoger kopieert vendor/ bij het breken van tests; een link komt
+# dan van een oudere versie, en die geeft hier liever een duidelijke fout dan een vals oordeel.
 if [[ -L vendor ]]; then
-  vendor_doel="$(readlink -f vendor)"
-  if [[ ! -d "$vendor_doel" ]]; then
-    echo "vendor/ is een link naar $vendor_doel, maar die map bestaat niet" >&2
-    exit 1
-  fi
-  docker_args+=(
-    --tmpfs "/work:uid=$(id -u),gid=$(id -g)"
-    --workdir /work
-    --volume "$vendor_doel:/work/vendor:ro"
-  )
-  for item in .[!.]* *; do
-    [[ -e "$item" && "$item" != vendor ]] || continue
-    docker_args+=(--volume "$REPO_ROOT/$item:/work/$item")
-  done
-else
-  docker_args+=(--workdir /var/www/html --volume "$REPO_ROOT:/var/www/html")
+  echo "vendor/ is een link; werk de plugin hobby-ontwikkeling bij naar 0.5.2 of hoger" >&2
+  exit 1
 fi
 
 in_container() {
