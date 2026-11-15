@@ -1,0 +1,9 @@
+# Controles voor hobby-ontwikkeling (controles.sh van de plugin). Een commando per regel,
+# uitgevoerd met bash -c vanuit de repo-root. PHP draait via docker als de host-gebruiker,
+# zie scripts/docker-php.sh. Dezelfde controles als de CI (Pint en de testsuite), plus
+# composer audit en de shellscripts.
+bash scripts/docker-php.sh vendor/bin/pint --test
+bash scripts/docker-php.sh php artisan test --compact
+bash scripts/docker-php.sh composer audit --locked
+for f in scripts/*.sh docker-entrypoint.sh; do bash -n "$f" || exit 1; done
+shellcheck scripts/*.sh docker-entrypoint.sh

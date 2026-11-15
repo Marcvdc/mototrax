@@ -1,0 +1,3 @@
+# Sjabloon om een losse test te draaien, voor de sabotagecheck van de onafhankelijke review.
+# De plugin vult {bestand} en {naam} in (al gequote) en draait de regel vanuit de repo-root.
+bash scripts/docker-php.sh php artisan test --compact --filter {naam} {bestand}
