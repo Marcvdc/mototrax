@@ -42,34 +42,49 @@ fi
 
 mkdir -p "$COMPOSER_CACHE"
 
+if [[ ! -f .env ]]; then
+  echo "Geen .env, aanmaken uit .env.example" >&2
+  cp .env.example .env
+fi
+
 docker_args=(
   run --rm
   --user "$(id -u):$(id -g)"
   --entrypoint ""
-  --workdir /var/www/html
   --env HOME=/tmp
   --env COMPOSER_HOME=/tmp/composer
   --env COMPOSER_CACHE_DIR=/tmp/composer-cache
-  --volume "$REPO_ROOT:/var/www/html"
   --volume "$REPO_ROOT/php/local.ini:/usr/local/etc/php/conf.d/local.ini:ro"
   --volume "$COMPOSER_CACHE:/tmp/composer-cache"
 )
 
-# De onafhankelijke review linkt vendor/ uit een andere worktree. Die link wijst naar een
-# absoluut hostpad, dus dat pad moet in de container op dezelfde plek bestaan.
+# De sabotagecheck van de onafhankelijke review linkt vendor/ uit een andere worktree.
+# Composer rekent de paden naar app/ uit vanaf de echte plek van vendor/, dus via die link
+# zou de autoloader de code uit de andere worktree laden. Een mount op vendor/ volgt de link
+# ook. Daarom komt in dat geval elk item uit de repo-root los in /work te staan, en het doel
+# van de link als gewone map op /work/vendor.
 if [[ -L vendor ]]; then
   vendor_doel="$(readlink -f vendor)"
-  docker_args+=(--volume "$vendor_doel:$vendor_doel:ro")
+  if [[ ! -d "$vendor_doel" ]]; then
+    echo "vendor/ is een link naar $vendor_doel, maar die map bestaat niet" >&2
+    exit 1
+  fi
+  docker_args+=(
+    --tmpfs "/work:uid=$(id -u),gid=$(id -g)"
+    --workdir /work
+    --volume "$vendor_doel:/work/vendor:ro"
+  )
+  for item in .[!.]* *; do
+    [[ -e "$item" && "$item" != vendor ]] || continue
+    docker_args+=(--volume "$REPO_ROOT/$item:/work/$item")
+  done
+else
+  docker_args+=(--workdir /var/www/html --volume "$REPO_ROOT:/var/www/html")
 fi
 
 in_container() {
   docker "${docker_args[@]}" "$IMAGE" "$@"
 }
-
-if [[ ! -f .env ]]; then
-  echo "Geen .env, aanmaken uit .env.example" >&2
-  cp .env.example .env
-fi
 
 if [[ ! -e vendor ]]; then
   echo "Geen vendor/, composer install draaien" >&2
