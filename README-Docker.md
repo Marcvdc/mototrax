@@ -47,6 +47,20 @@ If you have multiple Docker apps running:
 3. Access logs: `docker-compose logs -f app`
 4. Stop containers: `docker-compose down`
 
+## Tests en Pint zonder lokale PHP
+
+`scripts/docker-php.sh` draait een PHP-commando in de app-image, als je eigen gebruiker en zonder
+database (de tests gebruiken sqlite in het geheugen). Ontbreken `.env` of `vendor/`, dan maakt
+het script die eerst aan.
+
+```bash
+scripts/docker-php.sh php artisan test --compact
+scripts/docker-php.sh vendor/bin/pint --test
+```
+
+`.hobby-controles` en `.hobby-enkele-test` gebruiken hetzelfde script, zodat de controles van de
+plugin hobby-ontwikkeling (en de onafhankelijke review) ook zonder PHP op de host draaien.
+
 ## Troubleshooting
 
 - **Port conflicts**: Edit docker-compose.local.yml for different ports
