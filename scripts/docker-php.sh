@@ -61,10 +61,10 @@ docker_args=(
 )
 
 # Een gelinkte vendor/ zou de autoloader de code van de andere kant van de link laten laden.
-# hobby-ontwikkeling 0.5.2 en hoger kopieert vendor/ bij het breken van tests; een link komt
-# dan van een oudere versie, en die geeft hier liever een duidelijke fout dan een vals oordeel.
+# Liever een duidelijke fout dan een vals oordeel. hobby-ontwikkeling 0.5.2 en hoger kopieert
+# vendor/ bij het breken van tests; oudere versies linken hem.
 if [[ -L vendor ]]; then
-  echo "vendor/ is een link; werk de plugin hobby-ontwikkeling bij naar 0.5.2 of hoger" >&2
+  echo "vendor/ is een link; gebruik een gewone map, of werk hobby-ontwikkeling bij naar 0.5.2 of hoger" >&2
   exit 1
 fi
 
