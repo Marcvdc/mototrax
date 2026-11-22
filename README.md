@@ -170,3 +170,7 @@ For issues and questions:
 ---
 
 Built with ❤️ for the motorcycle community
+
+## 🤖 Werken met de agent hub
+
+Een issue met het label `agent-ok`, gezet door de eigenaar, kan door een worker van de agent hub worden opgepakt. Die werkt op een branch `agent/<issue>-…` en opent een draft-PR naar `master`, die de eigenaar reviewt en merget.
