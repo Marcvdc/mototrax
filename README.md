@@ -130,7 +130,7 @@ If you have multiple Docker apps running:
 ## 🧰 Tech Stack
 
 - **Backend**: Laravel 13 + PHP 8.4
-- **Frontend**: Filament v5 + Blade
+- **Frontend**: Filament v5 + Blade, Tailwind CSS 4, Alpine.js 3, Leaflet 1.9 (kaarten), Vite 8 (build)
 - **Database**: PostgreSQL 15
 - **Containerization**: Docker + Docker Compose
 - **Web Server**: Nginx
