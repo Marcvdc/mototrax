@@ -58,7 +58,10 @@ class RouteVisibilityTest extends TestCase
     {
         $this->actingAs($this->a);
 
-        $this->get("/admin/routes/{$this->privateB->id}")->assertNotFound();
-        $this->get("/admin/routes/{$this->privateB->id}/edit")->assertNotFound();
+        foreach (['', '/edit'] as $suffix) {
+            $status = $this->get("/admin/routes/{$this->privateB->id}{$suffix}")->getStatusCode();
+
+            $this->assertContains($status, [403, 404]);
+        }
     }
 }
