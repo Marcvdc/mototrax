@@ -5,6 +5,7 @@ namespace Tests\Feature\Filament;
 use App\Filament\Resources\RouteResource\Pages\ListRoutes;
 use App\Models\Route;
 use App\Models\User;
+use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -26,6 +27,7 @@ class RouteVisibilityTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
 
         $this->a = User::factory()->create();
         $this->b = User::factory()->create();

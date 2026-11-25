@@ -35,12 +35,15 @@ class RouteResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedMapPin;
 
+    /**
+     * Gewone gebruikers zien eigen en openbare routes; een admin ziet alles,
+     * want Gate::before geldt niet voor query-filters.
+     */
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery();
         $user = auth()->user();
 
-        // Gate::before geldt niet voor query-filters: admin expliciet uitzonderen.
         if ($user?->isAdmin()) {
             return $query;
         }
