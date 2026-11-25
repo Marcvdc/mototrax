@@ -27,12 +27,35 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class RouteResource extends Resource
 {
     protected static ?string $model = Route::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedMapPin;
+
+    /**
+     * Gewone gebruikers zien eigen en openbare routes; een admin ziet alles,
+     * want Gate::before geldt niet voor query-filters.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        $user = auth()->user();
+
+        if ($user?->isAdmin()) {
+            return $query;
+        }
+
+        return $query->where(function (Builder $q) use ($user): void {
+            $q->where('is_public', true);
+
+            if ($user !== null) {
+                $q->orWhere('user_id', $user->id);
+            }
+        });
+    }
 
     public static function form(Schema $schema): Schema
     {
